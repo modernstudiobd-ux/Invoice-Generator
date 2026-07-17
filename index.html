@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ledger — Invoice Generator</title>
+<meta name="description" content="Create, preview, and print invoices. Works offline, installable on your phone.">
+<meta name="theme-color" content="#1F3A38">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-mark">Ledger</span>
+    <span class="brand-sub">invoice generator</span>
+  </div>
+
+  <div class="topbar-actions">
+    <select id="invoiceSelect" class="invoice-select" aria-label="Saved invoices"></select>
+    <button id="newBtn" class="btn btn-ghost" type="button">New</button>
+    <button id="saveBtn" class="btn btn-ghost" type="button">Save</button>
+    <button id="deleteBtn" class="btn btn-ghost btn-danger" type="button">Delete</button>
+    <button id="printBtn" class="btn btn-primary" type="button">Print / Save PDF</button>
+  </div>
+
+  <div class="view-toggle" role="tablist" aria-label="Switch view">
+    <button class="toggle-btn active" data-view="edit" role="tab" aria-selected="true" type="button">Edit</button>
+    <button class="toggle-btn" data-view="preview" role="tab" aria-selected="false" type="button">Preview</button>
+  </div>
+</header>
+
+<main class="workspace">
+
+  <!-- EDIT PANEL -->
+  <section class="panel edit-panel" id="editPanel" aria-label="Invoice details form">
+
+    <div class="field-group">
+      <h2 class="group-title">From</h2>
+      <label class="field"><span>Business name</span>
+        <input id="fromName" type="text" placeholder="Your business name">
+      </label>
+      <label class="field"><span>Address</span>
+        <textarea id="fromAddress" rows="2" placeholder="Street, city, country"></textarea>
+      </label>
+      <div class="field-row">
+        <label class="field"><span>Email</span>
+          <input id="fromEmail" type="email" placeholder="you@business.com">
+        </label>
+        <label class="field"><span>Phone</span>
+          <input id="fromPhone" type="text" placeholder="+880 ...">
+        </label>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <h2 class="group-title">Bill to</h2>
+      <label class="field"><span>Client name</span>
+        <input id="toName" type="text" placeholder="Client or company name">
+      </label>
+      <label class="field"><span>Address</span>
+        <textarea id="toAddress" rows="2" placeholder="Street, city, country"></textarea>
+      </label>
+      <label class="field"><span>Email</span>
+        <input id="toEmail" type="email" placeholder="client@email.com">
+      </label>
+    </div>
+
+    <div class="field-group">
+      <h2 class="group-title">Details</h2>
+      <div class="field-row">
+        <label class="field"><span>Invoice #</span>
+          <input id="invoiceNumber" type="text" placeholder="INV-0001">
+        </label>
+        <label class="field"><span>Status</span>
+          <select id="status">
+            <option value="draft">Draft</option>
+            <option value="sent">Sent</option>
+            <option value="paid">Paid</option>
+            <option value="overdue">Overdue</option>
+          </select>
+        </label>
+      </div>
+      <div class="field-row">
+        <label class="field"><span>Issue date</span>
+          <input id="issueDate" type="date">
+        </label>
+        <label class="field"><span>Due date</span>
+          <input id="dueDate" type="date">
+        </label>
+      </div>
+      <label class="field"><span>Currency</span>
+        <select id="currency">
+          <option value="$">USD ($)</option>
+          <option value="€">EUR (€)</option>
+          <option value="£">GBP (£)</option>
+          <option value="৳">BDT (৳)</option>
+          <option value="₹">INR (₹)</option>
+          <option value="¥">JPY (¥)</option>
+        </select>
+      </label>
+    </div>
+
+    <div class="field-group">
+      <h2 class="group-title">Line items</h2>
+      <div id="lineItems" class="line-items"></div>
+      <button id="addItemBtn" class="btn btn-ghost btn-small" type="button">+ Add line item</button>
+    </div>
+
+    <div class="field-group">
+      <h2 class="group-title">Totals</h2>
+      <div class="field-row">
+        <label class="field"><span>Tax (%)</span>
+          <input id="taxRate" type="number" min="0" step="0.01" value="0">
+        </label>
+        <label class="field"><span>Discount (%)</span>
+          <input id="discountRate" type="number" min="0" step="0.01" value="0">
+        </label>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <h2 class="group-title">Notes / terms</h2>
+      <label class="field"><span>Shown at the bottom of the invoice</span>
+        <textarea id="notes" rows="3" placeholder="Payment terms, thank-you note, bank details..."></textarea>
+      </label>
+    </div>
+
+  </section>
+
+  <!-- PREVIEW -->
+  <section class="panel preview-panel" id="previewPanel" aria-label="Invoice preview">
+    <div class="paper" id="paper">
+
+      <div class="paper-head">
+        <div class="paper-head-left">
+          <h1 class="paper-title">Invoice</h1>
+          <div class="paper-number" id="pv-number">INV-0001</div>
+        </div>
+        <div class="stamp" id="pv-stamp">DRAFT</div>
+      </div>
+
+      <div class="paper-parties">
+        <div class="party">
+          <div class="party-label">From</div>
+          <div class="party-name" id="pv-fromName">Your business</div>
+          <div class="party-line" id="pv-fromAddress"></div>
+          <div class="party-line" id="pv-fromContact"></div>
+        </div>
+        <div class="party">
+          <div class="party-label">Bill to</div>
+          <div class="party-name" id="pv-toName">Client name</div>
+          <div class="party-line" id="pv-toAddress"></div>
+          <div class="party-line" id="pv-toContact"></div>
+        </div>
+        <div class="party party-dates">
+          <div class="date-row"><span>Issued</span><span id="pv-issueDate">—</span></div>
+          <div class="date-row"><span>Due</span><span id="pv-dueDate">—</span></div>
+        </div>
+      </div>
+
+      <table class="paper-table">
+        <thead>
+          <tr>
+            <th class="col-desc">Description</th>
+            <th class="col-num">Qty</th>
+            <th class="col-num">Rate</th>
+            <th class="col-num">Amount</th>
+          </tr>
+        </thead>
+        <tbody id="pv-lineItems"></tbody>
+      </table>
+
+      <div class="paper-totals">
+        <div class="totals-box">
+          <div class="totals-row"><span>Subtotal</span><span id="pv-subtotal">0.00</span></div>
+          <div class="totals-row" id="pv-taxRow"><span>Tax</span><span id="pv-tax">0.00</span></div>
+          <div class="totals-row" id="pv-discountRow"><span>Discount</span><span id="pv-discount">0.00</span></div>
+          <div class="totals-row totals-final"><span>Total due</span><span id="pv-total">0.00</span></div>
+        </div>
+      </div>
+
+      <div class="paper-notes" id="pv-notes"></div>
+
+    </div>
+  </section>
+
+</main>
+
+<script src="app.js"></script>
+</body>
+</html>
