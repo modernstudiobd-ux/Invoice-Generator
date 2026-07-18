@@ -18,7 +18,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Invoice Studio">
 <style>
-:root{--accent:#18181b;--accent-rgb:24,24,27;--ink:#1f2937;--font-modern:Inter,"Segoe UI",Arial,sans-serif;--muted:#667085;--line:#d7dde7;--bg:#edf1f6;--panel:#fff;--danger:#b42318;--radius:12px;--sidebar-width:400px}
+:root{--accent:#18181b;--accent-rgb:24,24,27;--ink:#1f2937;--font-modern:Inter,"Segoe UI",Arial,sans-serif;--muted:#667085;--line:#d7dde7;--bg:#edf1f6;--panel:#fff;--danger:#b42318;--radius:12px;--sidebar-width:400px;--page-w:210mm;--page-h:297mm}
 *{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact;color-adjust:exact}body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--ink);padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right)}
 button,input,select,textarea{font:inherit}button{cursor:pointer}
 button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid rgba(var(--accent-rgb),.22);outline-offset:2px}
@@ -42,9 +42,9 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 /* Responsive document canvas: the invoice keeps true A4 proportions (210mm x 297mm)
    for accurate print/PDF output, while this wrapper lets it scale down as one
    modular unit to fit any viewport width instead of forcing horizontal scrolling. */
-.canvaswrap{width:100%;max-width:210mm;margin:0 auto;container-type:inline-size;overflow:hidden;position:relative}
+.canvaswrap{width:100%;max-width:var(--page-w);margin:0 auto;container-type:inline-size;overflow:hidden;position:relative}
 .canvasbar{width:100%;margin:0 auto 10px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}.canvasbar .meta{font-size:11px;color:var(--muted)}
-.invoice{--template-accent:var(--accent);width:210mm;min-height:297mm;margin:auto;background:#fff;box-shadow:0 18px 55px rgba(16,24,40,.14);padding:12mm 12mm 11mm;position:relative;overflow:hidden;font-family:var(--font-modern)}
+.invoice{--template-accent:var(--accent);width:var(--page-w);min-height:var(--page-h);margin:auto;background:#fff;box-shadow:0 18px 55px rgba(16,24,40,.14);padding:12mm 12mm 11mm;position:relative;overflow:hidden;font-family:var(--font-modern)}
 .invoice .section-hidden{display:none!important}.inv-header{display:grid;grid-template-columns:1.15fr .85fr;gap:18px}.companywrap{display:flex;gap:12px;align-items:flex-start}.logobox{display:inline-flex;align-items:center;justify-content:center;flex:none}.logobox:not(.has-logo){width:var(--logo-h,48px);height:var(--logo-h,48px);border:1px solid #d7dde6;border-radius:10px;background:#f7f9fc}.logobox img{display:none;max-height:var(--logo-h,48px);max-width:220px;width:auto;height:auto;object-fit:contain}.logobox.has-logo img{display:block}.logobox.has-logo .logofallback{display:none}.logofallback{width:100%;height:100%;border-radius:11px;background:var(--template-accent);color:#fff;font-size:calc(var(--logo-h,48px)*0.42);font-weight:900;display:grid;place-items:center}.companyname{font-size:20px;font-weight:800;margin:1px 0 5px}.metaText{white-space:pre-line;font-size:10.5px;color:#485568;line-height:1.4}.invtitle{text-align:right}.invtitle h2{margin:0;font-size:34px;font-weight:300;letter-spacing:.04em}.invno{font-size:15px;color:#667085;font-weight:700;margin-top:3px}.metatable{width:100%;margin-top:10px;border-collapse:collapse;font-size:10.5px}.metatable td{padding:2.5px 0}.metatable td:first-child{text-align:left;color:#667085}.metatable td:last-child{text-align:right;font-weight:700}.balance{margin-top:10px;background:rgba(var(--accent-rgb),.08);border:1px solid rgba(var(--accent-rgb),.14);border-radius:8px;padding:8px 10px;display:flex;justify-content:space-between;align-items:center;font-size:12px;font-weight:800}.balance strong{font-size:18px;color:var(--template-accent)}
 .statusbalance{margin-top:10px;display:flex;flex-direction:column;align-items:flex-start;gap:6px}.statusbalance .balance{margin-top:0;width:100%}
 .billrow{margin:14px 0}.label{font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:#667085;font-weight:850;margin-bottom:4px}.clientname{font-size:14px;font-weight:850;margin-bottom:3px}.status{display:inline-flex;flex:none;white-space:nowrap;padding:5px 9px;border-radius:999px;font-size:9.5px;font-weight:850;border:1px solid #abefc6;background:#ecfdf3;color:#18794e}
@@ -85,7 +85,30 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .template-compact .notebox{padding:7px;min-height:56px}
 
 
-.toast{position:fixed;right:20px;bottom:20px;background:#172033;color:#fff;padding:11px 14px;border-radius:10px;box-shadow:0 12px 35px rgba(0,0,0,.25);font-size:12px;opacity:0;transform:translateY(8px);pointer-events:none;transition:.2s;z-index:99}.toast.show{opacity:1;transform:none}
+/* Mobile edit/preview switcher — hidden entirely on desktop; only takes over
+   once the sidebar and workspace have already stacked (see breakpoint below),
+   since side-by-side editing + preview doesn't fit on a phone screen. */
+.mobileview-toggle{display:none}
+@media (max-width:1080px){
+  .mobileview-toggle{display:flex;gap:8px;position:sticky;top:0;z-index:15;background:#fff;padding:10px 14px;border-bottom:1px solid var(--line);padding-top:calc(10px + env(safe-area-inset-top))}
+  .mobileview-toggle .btn{flex:1 1 0;text-align:center}
+  .mobileview-toggle .btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
+  #appRoot.view-edit .workspace{display:none}
+  #appRoot.view-preview .sidebar{display:none}
+}
+
+/* Desktop sidebar collapse — a slim floating toggle that hides the sidebar
+   entirely and hands its width back to the preview; desktop only (matches
+   the same 1080px breakpoint the sidebar-resizer already uses). */
+.sidebar-toggle{display:none}
+@media (min-width:1081px){
+  .sidebar-toggle{display:grid;place-items:center;position:fixed;top:16px;left:calc(var(--sidebar-width) - 15px);width:30px;height:30px;border-radius:50%;border:1px solid var(--line);background:#fff;box-shadow:0 4px 14px rgba(16,24,40,.14);z-index:20;font-size:13px;color:var(--ink);transition:left .18s ease}
+  .app.sidebar-collapsed{grid-template-columns:0 minmax(0,1fr)}
+  .app.sidebar-collapsed .sidebar{padding:0;border-right:0}
+  .app.sidebar-collapsed .sidebar>*{display:none}
+  .app.sidebar-collapsed .sidebar-resizer{display:none}
+  .app.sidebar-collapsed .sidebar-toggle{left:14px}
+}
 
 /* Responsive breakpoints — the sidebar and workspace are independent modules
    that reflow from a two-column layout into a stacked layout as space shrinks. */
@@ -125,22 +148,27 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 }
 
 </style>
+<style id="pageSizeCSS"></style>
 </head>
 <body>
+<div class="mobileview-toggle" id="mobileViewToggle" role="tablist" aria-label="Switch between editor and preview">
+  <button class="btn small active" id="mvEditBtn" role="tab" aria-selected="true" data-view="edit">✎ Edit</button>
+  <button class="btn small" id="mvPreviewBtn" role="tab" aria-selected="false" data-view="preview">👁 Preview</button>
+</div>
 <div class="app" id="appRoot">
 <aside class="sidebar" id="sidebar">
   <div class="topbar">
     <div class="brand"><div class="mark">I</div><div><h1>Invoice Studio Pro</h1><p>Columns, spreadsheet imports and live design · drag right edge to resize</p></div></div>
   </div>
   <div class="actions">
-    <button class="btn primary" id="pdfBtn" title="Opens the print dialog — choose &quot;Save as PDF&quot; as the destination">Export PDF</button>
+    <button class="btn primary" id="pdfBtn" title="Downloads a PDF of the invoice directly — no print dialog">Export PDF</button>
     <button class="btn" id="printBtn">Print</button>
     <button class="btn" id="exportBtn">Export JSON</button>
     <button class="btn" id="importBtn">Import JSON</button>
     <button class="btn danger" id="resetBtn">Reset</button>
     <input type="file" id="jsonFile" class="hidden" accept=".json">
   </div>
-  <p class="hint" style="margin:-4px 0 8px">Export PDF/Print gives crisp, selectable text with backgrounds rendered correctly. For a clean copy, open "More settings" in the print dialog and turn off "Headers and footers" — browsers reserve that toggle for you and won't let a website switch it off automatically.</p>
+  <p class="hint" style="margin:-4px 0 8px">Export PDF downloads the file straight to your device. Print opens your browser's print dialog for physical copies (or "Save as PDF" there too, if you prefer that route).</p>
   <div class="notice">All invoice values are blank/default. No financial data from the uploaded samples has been copied into the application.</div>
   <nav class="tabs" role="tablist" aria-label="Invoice sections">
     <button class="tab active" role="tab" id="tabbtn-details" data-tab="details" aria-selected="true" aria-controls="tab-details">Details</button>
@@ -281,6 +309,15 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 
   <div class="tabpane" id="tab-design" role="tabpanel" aria-labelledby="tabbtn-design">
     <section class="panel">
+      <div class="panelhead"><h2>Page setup</h2><span class="hint">Affects screen, print and PDF</span></div>
+      <div class="field"><label for="paperSize">Paper size</label>
+        <select id="paperSize">
+          <option value="a4">A4 — 210 × 297 mm (International)</option>
+          <option value="letter">US Letter — 8.5 × 11 in</option>
+        </select>
+      </div>
+    </section>
+    <section class="panel">
       <div class="panelhead"><h2>Invoice layout</h2><span class="hint">Live switching</span></div>
       <div class="field"><label for="template">Design</label>
         <select id="template">
@@ -307,6 +344,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
     </section>
   </div>
 <div class="sidebar-resizer" id="sidebarResizer" title="Drag to resize sidebar"></div>
+<button class="sidebar-toggle" id="sidebarToggleBtn" title="Collapse sidebar" aria-label="Collapse sidebar">‹</button>
 </aside>
 
 <main class="workspace">
@@ -377,8 +415,16 @@ const sectionDefs=[
  ["terms","Terms"],["footer","Footer"]
 ];
 const state={logo:"",logoNatural:null,zoom:1,columns:defaultColumns(),items:[],sections:Object.fromEntries(sectionDefs.map(x=>[x[0],true]))};
-const fields=["logoHeight","invoiceNumber","status","invoiceDate","dueDate","currency","reference","companyName","companyReg","companyVat","companyAddress","companyPhone","companyEmail","companyWebsite","clientName","clientContact","clientTax","clientAddress","clientEmail","discount","tax","shipping","notes","paymentDetails","terms","template","accent","accentHex"];
+const fields=["logoHeight","invoiceNumber","status","invoiceDate","dueDate","currency","reference","companyName","companyReg","companyVat","companyAddress","companyPhone","companyEmail","companyWebsite","clientName","clientContact","clientTax","clientAddress","clientEmail","discount","tax","shipping","notes","paymentDetails","terms","template","accent","accentHex","paperSize"];
 const DEFAULT_ACCENT="#18181b";
+const PAPER_SIZES={a4:{w:210,h:297,page:"A4"},letter:{w:215.9,h:279.4,page:"215.9mm 279.4mm"}};
+function currentPaper(){const sel=$("paperSize");return PAPER_SIZES[sel?sel.value:"a4"]||PAPER_SIZES.a4}
+function applyPaperSize(){
+ const p=currentPaper();
+ document.documentElement.style.setProperty("--page-w",p.w+"mm");
+ document.documentElement.style.setProperty("--page-h",p.h+"mm");
+ $("pageSizeCSS").textContent=p.page==="A4"?"":`@page{size:${p.page};margin:0}`;
+}
 
 function today(){let d=new Date(),o=d.getTimezoneOffset();return new Date(d-o*60000).toISOString().slice(0,10)}
 function plusDays(s,n){let d=new Date(s+"T00:00:00");d.setDate(d.getDate()+n);return d.toISOString().slice(0,10)}
@@ -399,6 +445,7 @@ function metaClient(){let a=[];if($("clientContact").value.trim())a.push($("clie
 function fmtCell(v,col){if(col.type==="currency")return money(v);if(col.type==="number")return num(v).toLocaleString("en-US",{maximumFractionDigits:2});if(col.type==="percentage")return num(v).toFixed(2).replace(/\.00$/,"")+"%";if(col.type==="date")return dateFmt(v);return esc(v).replaceAll("\n","<br>")}
 function renderPreview(){
  let inv=$("invoice"),tpl=$("template").value;inv.className="invoice template-"+tpl;
+ applyPaperSize();
  const labels={title:"INVOICE",bill:"Bill to",status:"Invoice status",balance:"Balance due",note:"Invoice note",payment:"Payment details",terms:"Terms",date:"Invoice date",due:"Due date",ref:"Reference"};
  $("pInvoiceTitle").textContent=labels.title;
  $("pBillToLabel").textContent=labels.bill;
@@ -449,8 +496,9 @@ function renderPreview(){
 function fitInvoiceCanvas(){
  const wrap=document.querySelector(".canvaswrap"),inv=$("invoice");
  if(!wrap||!inv)return;
- const naturalW=210*96/25.4;   // 210mm in CSS px at the standard 96dpi
- const naturalH=297*96/25.4;   // 297mm in CSS px
+ const p=currentPaper();
+ const naturalW=p.w*96/25.4;   // page width in CSS px at the standard 96dpi
+ const naturalH=p.h*96/25.4;   // page height in CSS px
  const available=wrap.clientWidth||naturalW;
  const fit=Math.min(1,available/naturalW);   // shrink to fit narrow screens; never auto-enlarge
  const total=fit*state.zoom;
@@ -530,6 +578,30 @@ sidebarResizer.addEventListener("dblclick",()=>{
  localStorage.setItem("invoiceStudio.sidebarWidth","430");
 });
 
+const sidebarToggleBtn=$("sidebarToggleBtn");
+function setSidebarCollapsed(collapsed){
+ appRoot.classList.toggle("sidebar-collapsed",collapsed);
+ sidebarToggleBtn.textContent=collapsed?"›":"‹";
+ sidebarToggleBtn.title=collapsed?"Expand sidebar":"Collapse sidebar";
+ sidebarToggleBtn.setAttribute("aria-label",sidebarToggleBtn.title);
+ localStorage.setItem("invoiceStudio.sidebarCollapsed",collapsed?"1":"0");
+}
+sidebarToggleBtn.addEventListener("click",()=>setSidebarCollapsed(!appRoot.classList.contains("sidebar-collapsed")));
+setSidebarCollapsed(localStorage.getItem("invoiceStudio.sidebarCollapsed")==="1");
+
+const mvEditBtn=$("mvEditBtn"),mvPreviewBtn=$("mvPreviewBtn");
+function setMobileView(view){
+ appRoot.classList.toggle("view-edit",view==="edit");
+ appRoot.classList.toggle("view-preview",view==="preview");
+ mvEditBtn.classList.toggle("active",view==="edit");
+ mvPreviewBtn.classList.toggle("active",view==="preview");
+ mvEditBtn.setAttribute("aria-selected",view==="edit"?"true":"false");
+ mvPreviewBtn.setAttribute("aria-selected",view==="preview"?"true":"false");
+}
+mvEditBtn.addEventListener("click",()=>setMobileView("edit"));
+mvPreviewBtn.addEventListener("click",()=>setMobileView("preview"));
+setMobileView("edit");
+
 const tabButtons=Array.from(document.querySelectorAll(".tab"));
 function activateTab(b,focus){
  tabButtons.forEach(x=>{let on=x===b;x.classList.toggle("active",on);x.setAttribute("aria-selected",on?"true":"false");x.tabIndex=on?0:-1});
@@ -582,6 +654,43 @@ $("logoFile").onchange=e=>{
 $("removeLogoBtn").onclick=()=>{state.logo="";state.logoNatural=null;$("logoFile").value="";$("logoHint").textContent="PNG, JPG, WEBP or SVG. Maximum 3 MB.";renderPreview();save();toast("Logo removed.")};
 $("resetLogoSizeBtn").onclick=()=>{$("logoHeight").value=naturalLogoHeight();renderPreview();save();toast(state.logoNatural?"Logo reset to its original size.":"Logo size reset to default.")};
 $("resetColorBtn").onclick=()=>{setAccent(DEFAULT_ACCENT);renderPreview();save();toast("Accent color reset.")};
+async function ensurePDFLibs(){
+ if(!window.html2canvas){
+   await new Promise((res,rej)=>{let s=document.createElement("script");s.src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js";s.onload=res;s.onerror=()=>rej(Error("PDF export library could not load. Check your connection and try again."));document.head.appendChild(s)});
+ }
+ if(!window.jspdf){
+   await new Promise((res,rej)=>{let s=document.createElement("script");s.src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js";s.onload=res;s.onerror=()=>rej(Error("PDF export library could not load. Check your connection and try again."));document.head.appendChild(s)});
+ }
+}
+async function downloadInvoicePDF(suggestedName){
+ const invoice=$("invoice");
+ const wrap=document.querySelector(".canvaswrap");
+ const workspaceEl=document.querySelector(".workspace");
+ const oldTransform=invoice.style.transform;
+ const oldWrapHeight=wrap?wrap.style.height:"";
+ const oldWorkspaceDisplay=workspaceEl?workspaceEl.style.display:"";
+ try{
+   toast("Preparing your PDF…");
+   await ensurePDFLibs();
+   if(workspaceEl)workspaceEl.style.display="block";   // ensure capturable even if hidden behind the mobile Edit view
+   invoice.style.transform="none";
+   if(wrap)wrap.style.height="auto";
+   await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));   // let layout settle before capture
+   const canvas=await html2canvas(invoice,{scale:3,useCORS:true,backgroundColor:"#ffffff"});
+   const p=currentPaper();
+   const {jsPDF}=window.jspdf;
+   const pdf=new jsPDF({unit:"mm",format:[p.w,p.h],orientation:"portrait"});
+   pdf.addImage(canvas.toDataURL("image/jpeg",0.95),"JPEG",0,0,p.w,p.h);
+   pdf.save((suggestedName||"invoice")+".pdf");
+ }catch(err){
+   toast(err.message||"PDF export failed — check your connection and try again.");
+ }finally{
+   invoice.style.transform=oldTransform;
+   if(wrap)wrap.style.height=oldWrapHeight;
+   if(workspaceEl)workspaceEl.style.display=oldWorkspaceDisplay;
+   fitInvoiceCanvas();
+ }
+}
 function printInvoice(suggestedName){
  const invoice=$("invoice");
  const wrap=document.querySelector(".canvaswrap");
@@ -599,8 +708,7 @@ function printInvoice(suggestedName){
 $("printBtn").onclick=()=>printInvoice();
 $("pdfBtn").onclick=()=>{
  const filename=($("invoiceNumber").value||"invoice").trim().replace(/[\\/:*?"<>|]+/g,"-");
- toast('In the print dialog, set Destination to "Save as PDF".');
- printInvoice(filename);
+ downloadInvoicePDF(filename);
 };
 $("exportBtn").onclick=()=>download(($("invoiceNumber").value||"invoice")+".json",JSON.stringify(serialize(),null,2));$("importBtn").onclick=()=>$("jsonFile").click();
 $("jsonFile").onchange=async e=>{try{load(JSON.parse(await e.target.files[0].text()));toast("Invoice imported.")}catch(err){toast(err.message)}e.target.value=""};
