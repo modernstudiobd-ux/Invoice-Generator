@@ -50,7 +50,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
    modular unit to fit any viewport width instead of forcing horizontal scrolling. */
 .canvaswrap{width:100%;max-width:var(--page-w);margin:0 auto;container-type:inline-size;overflow:hidden;position:relative}
 .canvasbar{width:100%;margin:0 auto 10px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}.canvasbar .meta{font-size:11px;color:var(--muted)}
-.invoice{--template-accent:var(--accent);width:var(--page-w);min-height:var(--page-h);margin:auto;background:#fff;box-shadow:0 18px 55px rgba(16,24,40,.14);padding:12mm 12mm 11mm;position:relative;overflow:hidden;font-family:var(--font-modern)}
+.invoice{--template-accent:var(--accent);width:var(--page-w);min-height:var(--page-h);margin:0;background:#fff;box-shadow:0 18px 55px rgba(16,24,40,.14);padding:12mm 12mm 11mm;position:relative;overflow:hidden;font-family:var(--font-modern)}
 .invoice .section-hidden{display:none!important}.inv-header{display:grid;grid-template-columns:1.15fr .85fr;gap:18px}.companywrap{display:flex;gap:12px;align-items:flex-start}.logobox{display:inline-flex;align-items:center;justify-content:center;flex:none}.logobox:not(.has-logo){width:var(--logo-h,48px);height:var(--logo-h,48px);border:1px solid #d7dde6;border-radius:10px;background:#f7f9fc}.logobox img{display:none;max-height:var(--logo-h,48px);max-width:220px;width:auto;height:auto;object-fit:contain}.logobox.has-logo img{display:block}.logobox.has-logo .logofallback{display:none}.logofallback{width:100%;height:100%;border-radius:11px;background:var(--template-accent);color:#fff;font-size:calc(var(--logo-h,48px)*0.42);font-weight:900;display:grid;place-items:center}.companyname{font-size:20px;font-weight:800;margin:1px 0 5px}.metaText{white-space:pre-line;font-size:10.5px;color:#485568;line-height:1.4}.invtitle{text-align:right}.invtitle h2{margin:0;font-size:34px;font-weight:300;letter-spacing:.04em}.invno{font-size:15px;color:#667085;font-weight:700;margin-top:3px}.metatable{width:100%;margin-top:10px;border-collapse:collapse;font-size:10.5px}.metatable td{padding:2.5px 0}.metatable td:first-child{text-align:left;color:#667085}.metatable td:last-child{text-align:right;font-weight:700}.balance{margin-top:10px;background:rgba(var(--accent-rgb),.08);border:1px solid rgba(var(--accent-rgb),.14);border-radius:8px;padding:8px 10px;display:flex;justify-content:space-between;align-items:center;font-size:12px;font-weight:800}.balance strong{font-size:18px;color:var(--template-accent)}
 .statusbalance{margin-top:10px;display:flex;flex-direction:column;align-items:flex-start;gap:6px}.statusbalance .balance{margin-top:0;width:100%}
 .billrow{margin:14px 0}.label{font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:#667085;font-weight:850;margin-bottom:4px}.clientname{font-size:14px;font-weight:850;margin-bottom:3px}.status{display:inline-flex;flex:none;white-space:nowrap;padding:5px 9px;border-radius:999px;font-size:9.5px;font-weight:850;border:1px solid #abefc6;background:#ecfdf3;color:#18794e}
@@ -579,8 +579,13 @@ function fitInvoiceCanvas(){
  const available=wrap.clientWidth||naturalW;
  const fit=Math.min(1,available/naturalW);   // shrink to fit narrow screens; never auto-enlarge
  const total=fit*state.zoom;
+ const scaledW=naturalW*total;
+ inv.style.transformOrigin="top left";
  inv.style.transform=`scale(${total})`;
- inv.style.transformOrigin="top center";
+ inv.style.marginLeft=((available-scaledW)/2)+"px";   // center explicitly — CSS auto-margins can't
+                                                        // center a box wider than its container (it just
+                                                        // left-aligns instead), which is exactly what
+                                                        // happened on phones before this fix
  wrap.style.height=Math.ceil(naturalH*total)+"px";
  $("zoomLabel").textContent=Math.round(state.zoom*100)+"%";
 }
@@ -961,13 +966,15 @@ function printInvoice(suggestedName){
  const wrap=document.querySelector(".canvaswrap");
  const oldTitle=document.title;
  const oldTransform=invoice.style.transform;
+ const oldMarginLeft=invoice.style.marginLeft;
  const oldWrapHeight=wrap?wrap.style.height:"";
  if(suggestedName)document.title=suggestedName;
  invoice.style.transform="none";
+ invoice.style.marginLeft="0";
  if(wrap)wrap.style.height="auto";
  requestAnimationFrame(()=>{
    window.print();
-   setTimeout(()=>{invoice.style.transform=oldTransform;if(wrap)wrap.style.height=oldWrapHeight;document.title=oldTitle},250);
+   setTimeout(()=>{invoice.style.transform=oldTransform;invoice.style.marginLeft=oldMarginLeft;if(wrap)wrap.style.height=oldWrapHeight;document.title=oldTitle},250);
  });
 }
 $("printBtn").onclick=()=>printInvoice();
