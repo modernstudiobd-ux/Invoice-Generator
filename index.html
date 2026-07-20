@@ -31,7 +31,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .actions-more{display:contents}.actions-more-toggle{display:none}
 .mtb-icon,.drawer-overlay,.mobile-drawer,.fullscreen-exit{display:none}
 .btn:hover{border-color:#9da9b9;transform:translateY(-1px)}.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}.btn.danger{color:var(--danger)}.btn.small{padding:6px 8px;font-size:11px}.btn.icon{width:31px;height:31px;padding:0}
-.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;background:#f1f4f8;padding:4px;border-radius:10px;margin-bottom:10px}.tab{border:0;background:transparent;border-radius:7px;padding:7px 4px;font-size:11px;font-weight:800}.tab.active{background:#fff;box-shadow:0 2px 8px rgba(16,24,40,.08);color:var(--accent)}
+.tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;background:#f1f4f8;padding:4px;border-radius:10px;margin-bottom:10px}.tab{border:0;background:transparent;border-radius:7px;padding:7px 3px;font-size:10.5px;font-weight:800}.tab.active{background:#fff;box-shadow:0 2px 8px rgba(16,24,40,.08);color:var(--accent)}
 .tabpane{display:none}.tabpane.active{display:block}
 .panel{border:1px solid var(--line);border-radius:var(--radius);padding:12px;margin-bottom:10px;background:var(--panel)}.panelhead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:9px}.panelhead h2{font-size:13px;margin:0}.hint{font-size:10px;color:var(--muted)}
 .grid2,.grid3{display:grid;gap:8px}.grid2{grid-template-columns:1fr 1fr}.grid3{grid-template-columns:repeat(3,1fr)}.full{grid-column:1/-1}
@@ -39,6 +39,10 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .toggleline{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 0;border-bottom:1px dashed #e0e5ec;font-size:12px}.toggleline:last-child{border-bottom:0}.switch{position:relative;width:38px;height:21px}.switch input{opacity:0;width:0;height:0}.slider{position:absolute;inset:0;background:#c9d1dc;border-radius:20px;transition:.2s}.slider:before{content:"";position:absolute;width:15px;height:15px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s}.switch input:checked+.slider{background:var(--accent)}.switch input:checked+.slider:before{transform:translateX(17px)}
 .columnrow{border:1px solid #dde3eb;border-radius:9px;padding:9px;margin-bottom:7px;background:#fbfcfe}.columnhead{display:flex;align-items:center;gap:6px;margin-bottom:7px}.drag{color:#98a2b3;cursor:grab;font-size:17px}.columnhead strong{font-size:11px;flex:1}.colgrid{display:grid;grid-template-columns:1.2fr .8fr .6fr;gap:7px}.tiny{font-size:10px}
 .itemcard{border:1px solid #dde3eb;border-radius:9px;padding:9px;margin-bottom:7px;background:#fbfcfe}.itemtop{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px}.itemtop strong{font-size:11px}.itemgrid{display:grid;gap:7px;grid-template-columns:repeat(2,1fr)}.itemgrid .field textarea{min-height:44px}
+.historycard{border:1px solid #dde3eb;border-radius:10px;padding:10px;margin-bottom:8px;background:#fbfcfe}.historycard.current{border-color:var(--accent);box-shadow:0 0 0 1px rgba(var(--accent-rgb),.25)}.historytop{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}.historytop strong{font-size:12.5px}.historyamount{font-size:12.5px;font-weight:800;white-space:nowrap}.historymeta{display:flex;justify-content:space-between;align-items:center;margin:6px 0 8px;gap:8px}.historyactions{display:flex;gap:6px;flex-wrap:wrap}.historyactions .btn{flex:1 1 auto}
+.tinybadge{font-size:8.5px;font-weight:800;color:var(--accent);background:rgba(var(--accent-rgb),.1);border-radius:6px;padding:2px 6px;margin-left:5px;text-transform:uppercase;letter-spacing:.04em;vertical-align:middle}
+.install-banner{display:flex;align-items:center;justify-content:space-between;gap:10px;background:rgba(var(--accent-rgb),.06);border:1px solid rgba(var(--accent-rgb),.16);border-radius:10px;padding:9px 10px;margin-bottom:10px;font-size:11.5px;line-height:1.35}
+@media (min-width:641px){.install-banner{display:none!important}}
 .importbox{display:flex;gap:7px;flex-wrap:wrap;align-items:center}.notice{font-size:11px;color:#475467;background:rgba(var(--accent-rgb),.07);border:1px solid rgba(var(--accent-rgb),.14);padding:8px 9px;border-radius:9px;margin-bottom:10px}
 .hidden{display:none!important}
 .toast{position:fixed;right:20px;bottom:20px;background:#172033;color:#fff;padding:11px 14px;border-radius:10px;box-shadow:0 12px 35px rgba(0,0,0,.25);font-size:12.5px;max-width:min(360px,calc(100vw - 40px));opacity:0;transform:translateY(8px);pointer-events:none;transition:.2s;z-index:99}
@@ -224,6 +228,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
   <button class="drawer-item active" data-tab="details" type="button">📄&nbsp; Details</button>
   <button class="drawer-item" data-tab="items" type="button">📋&nbsp; Items</button>
   <button class="drawer-item" data-tab="design" type="button">🎨&nbsp; Design</button>
+  <button class="drawer-item" data-tab="history" type="button">🕘&nbsp; History</button>
 </nav>
 <button class="fullscreen-exit" id="exitFullscreenBtn" aria-label="Exit fullscreen preview" title="Exit fullscreen">✕</button>
 <div class="app" id="appRoot">
@@ -231,9 +236,18 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
   <div class="topbar">
     <div class="brand"><div class="mark">I</div><div><h1>Invoice Studio Pro</h1><p>Columns, spreadsheet imports and live design · drag right edge to resize</p></div></div>
   </div>
+  <div class="install-banner hidden" id="installBanner">
+    <span>📲 Install this app for quick access and offline use.</span>
+    <div style="display:flex;gap:6px;flex:none">
+      <button class="btn small primary" id="installAppBtn" type="button">Install</button>
+      <button class="btn small icon" id="installDismissBtn" type="button" aria-label="Dismiss">✕</button>
+    </div>
+  </div>
   <div class="actions">
     <button class="btn primary" id="pdfBtn" title="Downloads a PDF of the invoice directly — no print dialog">Export PDF</button>
     <button class="btn" id="printBtn">Print</button>
+    <button class="btn icon" id="undoBtn" title="Undo (Ctrl+Z)" aria-label="Undo last change" disabled>↶</button>
+    <button class="btn icon" id="redoBtn" title="Redo (Ctrl+Shift+Z)" aria-label="Redo last change" disabled>↷</button>
     <button class="btn icon actions-more-toggle" id="actionsMoreBtn" aria-haspopup="true" aria-expanded="false" aria-controls="actionsMorePanel" title="More actions">⋯</button>
     <div class="actions-more" id="actionsMorePanel" role="menu">
       <button class="btn" id="exportBtn" role="menuitem">Export JSON</button>
@@ -248,6 +262,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
     <button class="tab active" role="tab" id="tabbtn-details" data-tab="details" aria-selected="true" aria-controls="tab-details">Details</button>
     <button class="tab" role="tab" id="tabbtn-items" data-tab="items" aria-selected="false" aria-controls="tab-items" tabindex="-1">Items</button>
     <button class="tab" role="tab" id="tabbtn-design" data-tab="design" aria-selected="false" aria-controls="tab-design" tabindex="-1">Design</button>
+    <button class="tab" role="tab" id="tabbtn-history" data-tab="history" aria-selected="false" aria-controls="tab-history" tabindex="-1">History</button>
   </nav>
 
   <div class="tabpane active" id="tab-details" role="tabpanel" aria-labelledby="tabbtn-details">
@@ -415,6 +430,22 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
     <section class="panel">
       <div class="panelhead"><h2>Show / hide sections</h2></div>
       <div id="sectionToggles"></div>
+    </section>
+  </div>
+
+  <div class="tabpane" id="tab-history" role="tabpanel" aria-labelledby="tabbtn-history">
+    <section class="panel">
+      <div class="panelhead"><h2>This invoice</h2><span class="hint">Number auto-increments</span></div>
+      <div class="importbox">
+        <button class="btn small primary" id="saveInvoiceBtn">💾 Save</button>
+        <button class="btn small" id="duplicateInvoiceBtn">⧉ Duplicate</button>
+        <button class="btn small" id="newInvoiceBtn">+ New invoice</button>
+      </div>
+      <p class="hint" style="margin-top:8px">Save keeps a reopenable copy in History below — your draft also autosaves as you type, but only Save adds a snapshot to the list. Duplicate saves a fresh copy with the next invoice number and today's dates. New invoice clears the client and items but keeps your company profile and design.</p>
+    </section>
+    <section class="panel">
+      <div class="panelhead"><h2>Saved invoices</h2><span class="hint" id="historyCount"></span></div>
+      <div id="historyList"></div>
     </section>
   </div>
 <div class="sidebar-resizer" id="sidebarResizer" title="Drag to resize sidebar"></div>
@@ -610,7 +641,133 @@ function renderColumns(){
 }
 function renderToggles(){let r=$("sectionToggles");r.innerHTML=sectionDefs.map(([k,l])=>`<div class="toggleline"><span id="toggle-label-${k}">${l}</span><label class="switch"><input type="checkbox" data-section-toggle="${k}" aria-labelledby="toggle-label-${k}" ${state.sections[k]?"checked":""}><span class="slider"></span></label></div>`).join("");r.querySelectorAll("[data-section-toggle]").forEach(e=>e.onchange=()=>{state.sections[e.dataset.sectionToggle]=e.checked;renderPreview();save()})}
 function serialize(){let f={};fields.forEach(id=>f[id]=$(id).value);return{version:2,logo:state.logo,logoNatural:state.logoNatural,zoom:state.zoom,columns:state.columns,items:state.items,sections:state.sections,fields:f}}
-function save(){try{localStorage.setItem(KEY,JSON.stringify(serialize()))}catch{toast("Could not save locally — your browser's storage may be full (try a smaller logo).")}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(serialize()))}catch{toast("Could not save locally — your browser's storage may be full (try a smaller logo).")}pushEditHistory()}
+
+/* --- Multi-invoice library (History tab) --- */
+const LIBRARY_KEY="invoiceStudio.library.v1",CURRENT_ID_KEY="invoiceStudio.currentId.v1";
+function loadLibrary(){try{const v=JSON.parse(localStorage.getItem(LIBRARY_KEY));return Array.isArray(v)?v:[]}catch{return[]}}
+function saveLibrary(lib){try{localStorage.setItem(LIBRARY_KEY,JSON.stringify(lib))}catch{toast("Could not save locally — your browser's storage may be full (try a smaller logo).")}}
+function getCurrentId(){return localStorage.getItem(CURRENT_ID_KEY)||""}
+function setCurrentId(id){try{localStorage.setItem(CURRENT_ID_KEY,id)}catch{}}
+function moneyFor(v,c){const cur=c||"USD",loc=CURRENCY_LOCALE[cur]||"en-US";try{return new Intl.NumberFormat(loc,{style:"currency",currency:cur,minimumFractionDigits:2}).format(num(v))}catch{return cur+" "+num(v).toFixed(2)}}
+function nextInvoiceNumber(){
+ const pool=loadLibrary().map(e=>e.invoiceNumber).concat([$("invoiceNumber")?$("invoiceNumber").value:""]);
+ let best=null;
+ pool.forEach(v=>{const m=/^(.*?)(\d+)\s*$/.exec(String(v||"").trim());if(m){const n=parseInt(m[2],10);if(!isNaN(n)&&(!best||n>best.n))best={prefix:m[1],n,digits:m[2].length}}});
+ return best?best.prefix+String(best.n+1).padStart(best.digits,"0"):"INV-1001";
+}
+function saveToHistory(){
+ try{
+   const snap=serialize();
+   let id=getCurrentId();
+   if(!id){id=uid();setCurrentId(id)}
+   let lib=loadLibrary();
+   const meta={id,invoiceNumber:$("invoiceNumber").value||"Untitled",clientName:$("clientName").value||"",status:$("status").value,currency:$("currency").value,total:calc().total,updatedAt:Date.now(),snapshot:snap};
+   const idx=lib.findIndex(x=>x.id===id);
+   if(idx>=0)lib[idx]=meta;else lib.unshift(meta);
+   saveLibrary(lib);
+   renderHistory();
+ }catch{toast("Could not save to history — your browser's storage may be full (try a smaller logo).")}
+}
+function renderHistory(){
+ const root=$("historyList"),countEl=$("historyCount");
+ if(!root)return;
+ const lib=loadLibrary().slice().sort((a,b)=>b.updatedAt-a.updatedAt);
+ const curId=getCurrentId();
+ if(countEl)countEl.textContent=lib.length?lib.length+(lib.length===1?" invoice saved":" invoices saved"):"";
+ if(!lib.length){root.innerHTML='<p class="hint">No saved invoices yet — click Save above to add this one.</p>';return}
+ root.innerHTML=lib.map(e=>`<div class="historycard${e.id===curId?" current":""}" data-id="${esc(e.id)}">
+   <div class="historytop"><div><strong>${esc(e.invoiceNumber||"Untitled")}</strong>${e.id===curId?'<span class="tinybadge">Current</span>':""}</div><span class="historyamount">${esc(moneyFor(e.total,e.currency))}</span></div>
+   <div class="historymeta"><span>${esc(e.clientName||"No client")} · ${esc(e.status||"Draft")}</span><span>${esc(new Date(e.updatedAt).toLocaleDateString())}</span></div>
+   <div class="historyactions"><button class="btn small" data-act="open" type="button">Open</button><button class="btn small" data-act="duplicate" type="button">Duplicate</button><button class="btn small danger" data-act="delete" type="button">Delete</button></div>
+ </div>`).join("");
+ root.querySelectorAll(".historycard").forEach(card=>{
+   const id=card.dataset.id;
+   card.querySelector('[data-act="open"]').onclick=()=>openInvoiceById(id);
+   card.querySelector('[data-act="duplicate"]').onclick=()=>duplicateInvoiceById(id);
+   card.querySelector('[data-act="delete"]').onclick=()=>deleteInvoiceById(id);
+ });
+}
+function openInvoiceById(id){
+ const entry=loadLibrary().find(x=>x.id===id);
+ if(!entry)return;
+ setCurrentId(id);
+ load(entry.snapshot);
+ renderHistory();
+ const tabBtn=$("tabbtn-details");
+ if(tabBtn&&typeof activateTab==="function")activateTab(tabBtn,false);
+ if(typeof setMobileView==="function")setMobileView("edit");
+ toast("Opened "+(entry.invoiceNumber||"invoice")+".");
+}
+function deleteInvoiceById(id){
+ const lib=loadLibrary(),entry=lib.find(x=>x.id===id);
+ if(!entry)return;
+ if(!confirm(`Delete "${entry.invoiceNumber||"this invoice"}" from History? This can't be undone.`))return;
+ saveLibrary(lib.filter(x=>x.id!==id));
+ renderHistory();
+ toast("Deleted from history.");
+}
+function duplicateCurrentInvoice(){
+ setCurrentId(uid());
+ $("invoiceNumber").value=nextInvoiceNumber();
+ $("invoiceDate").value=today();
+ $("dueDate").value=plusDays(today(),14);
+ renderPreview();save();saveToHistory();
+ toast("Duplicated as "+$("invoiceNumber").value+".");
+}
+function duplicateInvoiceById(id){
+ const entry=loadLibrary().find(x=>x.id===id);
+ if(!entry)return;
+ load(entry.snapshot);
+ duplicateCurrentInvoice();
+}
+function newInvoice(){
+ if(!confirm("Start a new invoice? This clears the client and items from your current draft (company info and design stay). Save first if you want to keep this draft in History."))return;
+ setCurrentId(uid());
+ $("invoiceNumber").value=nextInvoiceNumber();
+ $("status").value="Draft";
+ $("invoiceDate").value=today();
+ $("dueDate").value=plusDays(today(),14);
+ $("reference").value="";
+ ["clientName","clientContact","clientTax","clientAddress","clientEmail"].forEach(id=>$(id).value="");
+ $("discount").value="0";$("tax").value="0";$("shipping").value="0";
+ $("notes").value="";
+ state.items=[];
+ renderItems();renderPreview();save();
+ renderHistory();
+ toast("New invoice started — "+$("invoiceNumber").value);
+}
+
+/* --- Undo / Redo (works on every change, not just explicit History saves) --- */
+let editHistory=[],editHistoryIndex=-1,restoringHistory=false;
+const EDIT_HISTORY_LIMIT=50;
+function pushEditHistory(){
+ if(restoringHistory)return;
+ const snap=JSON.stringify(serialize());
+ if(editHistory[editHistoryIndex]===snap)return;
+ editHistory=editHistory.slice(0,editHistoryIndex+1);
+ editHistory.push(snap);
+ if(editHistory.length>EDIT_HISTORY_LIMIT)editHistory.shift();
+ editHistoryIndex=editHistory.length-1;
+ updateUndoRedoButtons();
+}
+function undo(){
+ if(editHistoryIndex<=0)return;
+ editHistoryIndex--;
+ restoringHistory=true;load(JSON.parse(editHistory[editHistoryIndex]));restoringHistory=false;
+ updateUndoRedoButtons();
+}
+function redo(){
+ if(editHistoryIndex>=editHistory.length-1)return;
+ editHistoryIndex++;
+ restoringHistory=true;load(JSON.parse(editHistory[editHistoryIndex]));restoringHistory=false;
+ updateUndoRedoButtons();
+}
+function updateUndoRedoButtons(){
+ const u=$("undoBtn"),r=$("redoBtn");
+ if(u)u.disabled=editHistoryIndex<=0;
+ if(r)r.disabled=editHistoryIndex>=editHistory.length-1;
+}
 function load(d){
  if(!d||typeof d!=="object")throw Error("Invalid invoice file.");
  fields.forEach(id=>{if(d.fields&&id in d.fields&&typeof d.fields[id]==="string")$(id).value=d.fields[id]});
@@ -984,7 +1141,7 @@ $("pdfBtn").onclick=()=>{
 };
 $("exportBtn").onclick=()=>download(($("invoiceNumber").value||"invoice")+".json",JSON.stringify(serialize(),null,2));$("importBtn").onclick=()=>$("jsonFile").click();
 $("jsonFile").onchange=async e=>{try{load(JSON.parse(await e.target.files[0].text()));toast("Invoice imported.")}catch(err){toast(err.message)}e.target.value=""};
-$("resetBtn").onclick=()=>{if(confirm("Reset the app and delete the locally saved invoice?")){localStorage.removeItem(KEY);location.reload()}};
+$("resetBtn").onclick=()=>{if(confirm("Reset the app and delete ALL locally saved invoices (current draft + History)? This cannot be undone.")){localStorage.removeItem(KEY);localStorage.removeItem(LIBRARY_KEY);localStorage.removeItem(CURRENT_ID_KEY);location.reload()}};
 $("importSheetBtn").onclick=()=>$("sheetFile").click();$("sheetFile").onchange=async e=>{let f=e.target.files[0];if(!f)return;try{let rows;if(f.name.toLowerCase().endsWith(".csv"))rows=parseCSV(await f.text());else{await ensureXLSX();let wb=XLSX.read(await f.arrayBuffer(),{type:"array"}),ws=wb.Sheets[wb.SheetNames[0]];rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:""})}let items=mapRows(rows);if(!items.length)throw Error("No usable invoice rows were found.");state.items=items;renderItems();renderPreview();save();toast(items.length+" items imported.")}catch(err){toast(err.message)}e.target.value=""};
 $("zoomIn").onclick=()=>{state.zoom=Math.min(1.3,state.zoom+.1);renderPreview();save()};$("zoomOut").onclick=()=>{state.zoom=Math.max(.6,state.zoom-.1);renderPreview();save()};
 $("invoiceDate").value=today();$("dueDate").value=plusDays(today(),14);
@@ -998,6 +1155,50 @@ if(!$("logoHeight").value)$("logoHeight").value="48";setAccent(DEFAULT_ACCENT);r
  }
 }
 try{let raw=localStorage.getItem(KEY);if(raw)load(JSON.parse(raw))}catch{}
+if(!getCurrentId())setCurrentId(uid());
+pushEditHistory();
+updateUndoRedoButtons();
+renderHistory();
+
+$("saveInvoiceBtn").onclick=()=>{saveToHistory();toast("Saved to history.")};
+$("duplicateInvoiceBtn").onclick=()=>duplicateCurrentInvoice();
+$("newInvoiceBtn").onclick=()=>newInvoice();
+$("undoBtn").onclick=()=>undo();
+$("redoBtn").onclick=()=>redo();
+document.addEventListener("keydown",e=>{
+ const tag=(e.target.tagName||"").toLowerCase();
+ if(tag==="input"||tag==="textarea"||tag==="select"||e.target.isContentEditable)return;
+ if(!(e.ctrlKey||e.metaKey))return;
+ if(e.key.toLowerCase()==="z"&&!e.shiftKey){e.preventDefault();undo()}
+ else if(e.key.toLowerCase()==="y"||(e.key.toLowerCase()==="z"&&e.shiftKey)){e.preventDefault();redo()}
+});
+
+/* --- Install prompt (Android/Chrome; iOS Safari has no such API and keeps
+   using the manual Share-sheet flow) --- */
+let deferredInstallPrompt=null;
+const installBanner=$("installBanner"),installAppBtn=$("installAppBtn"),installDismissBtn=$("installDismissBtn");
+const INSTALL_DISMISS_KEY="invoiceStudio.installDismissed";
+window.addEventListener("beforeinstallprompt",e=>{
+ e.preventDefault();
+ deferredInstallPrompt=e;
+ if(installBanner&&localStorage.getItem(INSTALL_DISMISS_KEY)!=="1")installBanner.classList.remove("hidden");
+});
+if(installAppBtn)installAppBtn.addEventListener("click",async()=>{
+ if(!deferredInstallPrompt)return;
+ deferredInstallPrompt.prompt();
+ const choice=await deferredInstallPrompt.userChoice;
+ deferredInstallPrompt=null;
+ if(installBanner)installBanner.classList.add("hidden");
+ if(choice.outcome==="accepted")toast("Installed — look for it on your home screen.");
+});
+if(installDismissBtn)installDismissBtn.addEventListener("click",()=>{
+ if(installBanner)installBanner.classList.add("hidden");
+ try{localStorage.setItem(INSTALL_DISMISS_KEY,"1")}catch{}
+});
+window.addEventListener("appinstalled",()=>{
+ if(installBanner)installBanner.classList.add("hidden");
+ deferredInstallPrompt=null;
+});
 
 if("serviceWorker" in navigator){
  window.addEventListener("load",()=>{
