@@ -22,8 +22,10 @@
 *{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact;color-adjust:exact}body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--ink);padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right)}
 button,input,select,textarea{font:inherit}button{cursor:pointer}
 button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid rgba(var(--accent-rgb),.22);outline-offset:2px}
-.app{display:grid;grid-template-columns:var(--sidebar-width) minmax(0,1fr);min-height:100vh}
+.app{display:grid;grid-template-columns:var(--sidebar-width) minmax(0,1fr);min-height:100vh;position:relative}
 .sidebar{height:100vh;overflow:auto;position:sticky;top:0;background:#fff;border-right:1px solid var(--line);padding:16px}
+.sidebar-resizer{position:absolute;top:0;left:var(--sidebar-width);width:6px;height:100%;margin-left:-3px;cursor:col-resize;z-index:16;background:transparent;transition:background .15s}
+.sidebar-resizer:hover,.sidebar-resizer.dragging{background:rgba(var(--accent-rgb),.35)}
 .workspace{padding:18px 20px;overflow:auto}.topbar{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-bottom:12px}
 .brand{display:flex;gap:10px;align-items:center}.mark{width:38px;height:38px;border-radius:11px;background:linear-gradient(145deg,#18181b,#52525b);color:#fff;font-weight:900;display:grid;place-items:center;flex:none}
 .brand h1{font-size:17px;margin:0}.brand p{margin:2px 0 0;font-size:11px;color:var(--muted)}
@@ -541,7 +543,7 @@ function alignClass(a){return a==="right"?"right":a==="center"?"center":""}
 function esc(v){return String(v??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;")}
 function dateFmt(v){if(!v)return"—";return new Intl.DateTimeFormat("en-US",{day:"numeric",month:"long",year:"numeric"}).format(new Date(v+"T00:00:00"))}
 const CURRENCY_LOCALE={USD:"en-US",CAD:"en-CA",MXN:"es-MX",BRL:"pt-BR",ARS:"es-AR",CLP:"es-CL",COP:"es-CO",PEN:"es-PE",UYU:"es-UY",JMD:"en-JM",EUR:"de-DE",GBP:"en-GB",CHF:"de-CH",SEK:"sv-SE",NOK:"nb-NO",DKK:"da-DK",PLN:"pl-PL",CZK:"cs-CZ",HUF:"hu-HU",RON:"ro-RO",UAH:"uk-UA",RUB:"ru-RU",TRY:"tr-TR",AED:"ar-AE",SAR:"ar-SA",QAR:"ar-QA",KWD:"ar-KW",BHD:"ar-BH",OMR:"ar-OM",ILS:"he-IL",EGP:"ar-EG",ZAR:"en-ZA",NGN:"en-NG",KES:"en-KE",GHS:"en-GH",AUD:"en-AU",NZD:"en-NZ",JPY:"ja-JP",CNY:"zh-CN",HKD:"zh-HK",TWD:"zh-TW",KRW:"ko-KR",SGD:"en-SG",INR:"en-IN",PKR:"en-PK",BDT:"bn-BD",LKR:"si-LK",NPR:"ne-NP",IDR:"id-ID",MYR:"ms-MY",PHP:"en-PH",THB:"th-TH",VND:"vi-VN"};
-function money(v){let c=$("currency").value,loc=CURRENCY_LOCALE[c]||"en-US";try{return new Intl.NumberFormat(loc,{style:"currency",currency:c,minimumFractionDigits:2}).format(num(v))}catch{return c+" "+num(v).toFixed(2)}}
+function money(v){let c=$("currency").value,loc=CURRENCY_LOCALE[c]||"en-US";try{return new Intl.NumberFormat(loc,{style:"currency",currency:c,currencyDisplay:"code",minimumFractionDigits:2}).format(num(v))}catch{return c+" "+num(v).toFixed(2)}}
 function toast(s){let e=$("toast");e.textContent=s;e.classList.add("show");clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove("show"),2200)}
 function safeColor(v){return /^#[0-9a-f]{6}$/i.test(v)?v:"#2563eb"}
 function setAccent(v){v=safeColor(v);let h=v.slice(1),rgb=[0,2,4].map(i=>parseInt(h.slice(i,i+2),16)).join(",");document.documentElement.style.setProperty("--accent",v);document.documentElement.style.setProperty("--accent-rgb",rgb);$("accent").value=v;$("accentHex").value=v}
@@ -649,7 +651,7 @@ function loadLibrary(){try{const v=JSON.parse(localStorage.getItem(LIBRARY_KEY))
 function saveLibrary(lib){try{localStorage.setItem(LIBRARY_KEY,JSON.stringify(lib))}catch{toast("Could not save locally — your browser's storage may be full (try a smaller logo).")}}
 function getCurrentId(){return localStorage.getItem(CURRENT_ID_KEY)||""}
 function setCurrentId(id){try{localStorage.setItem(CURRENT_ID_KEY,id)}catch{}}
-function moneyFor(v,c){const cur=c||"USD",loc=CURRENCY_LOCALE[cur]||"en-US";try{return new Intl.NumberFormat(loc,{style:"currency",currency:cur,minimumFractionDigits:2}).format(num(v))}catch{return cur+" "+num(v).toFixed(2)}}
+function moneyFor(v,c){const cur=c||"USD",loc=CURRENCY_LOCALE[cur]||"en-US";try{return new Intl.NumberFormat(loc,{style:"currency",currency:cur,currencyDisplay:"code",minimumFractionDigits:2}).format(num(v))}catch{return cur+" "+num(v).toFixed(2)}}
 function nextInvoiceNumber(){
  const pool=loadLibrary().map(e=>e.invoiceNumber).concat([$("invoiceNumber")?$("invoiceNumber").value:""]);
  let best=null;
