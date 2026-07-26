@@ -1,7 +1,7 @@
 // Invoice Studio Pro — Service Worker
 // Bump this version string whenever index.html (or any cached asset) changes,
 // so returning users automatically pick up the new version.
-const VERSION = "v1.3.1";
+const VERSION = "v2.5.0";
 const SHELL_CACHE = `invoice-studio-shell-${VERSION}`;
 const RUNTIME_CACHE = `invoice-studio-runtime-${VERSION}`;
 
@@ -10,6 +10,29 @@ const SHELL_ASSETS = [
   "./",
   "./index.html",
   "./manifest.webmanifest",
+  "./css/base.css",
+  "./css/invoice.css",
+  "./css/templates.css",
+  "./css/responsive.css",
+  "./css/print.css",
+  "./js/dom.js",
+  "./js/state.js",
+  "./js/format.js",
+  "./js/calc.js",
+  "./js/toast.js",
+  "./js/accent.js",
+  "./js/preview.js",
+  "./js/columns.js",
+  "./js/items.js",
+  "./js/toggles.js",
+  "./js/persistence.js",
+  "./js/invoiceData.js",
+  "./js/library.js",
+  "./js/layout.js",
+  "./js/importSheet.js",
+  "./js/pdfExport.js",
+  "./js/install.js",
+  "./js/main.js",
   "./icons/icon-72.png",
   "./icons/icon-96.png",
   "./icons/icon-128.png",
@@ -64,9 +87,10 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // Third-party assets (e.g. the xlsx library, loaded only when importing an
-  // .xlsx spreadsheet): stale-while-revalidate, so it still works offline after
-  // the first successful import, but stays fresh whenever online.
+  // Third-party assets (e.g. the xlsx/pdfmake libraries, loaded only when
+  // importing a spreadsheet or exporting a PDF): stale-while-revalidate, so
+  // it still works offline after the first successful use, but stays fresh
+  // whenever online.
   event.respondWith(
     caches.open(RUNTIME_CACHE).then(async (cache) => {
       const cached = await cache.match(request);

@@ -1,0 +1,23 @@
+/* Print & PDF-preview output rules */
+@page{size:A4;margin:0;margin-top:14mm;margin-bottom:12mm}
+@page :first{margin-top:0}
+@media print{
+  html,body{background:#fff}
+  .sidebar,.sidebar-resizer,.canvasbar{display:none!important}
+  .mobileview-toggle,.mobile-drawer,.drawer-overlay,.fullscreen-exit,.sidebar-toggle,.actions{display:none!important}
+  .invoice-toolbar,.page-break-line,.page-break-chip{display:none!important}
+  .app{display:block}
+  .workspace{padding:0;overflow:visible}
+  .canvaswrap{max-width:none;width:auto;height:auto!important}
+  .invoice{box-shadow:none;margin:0!important;width:auto;max-width:none;min-height:0;overflow:visible;transform:none!important}
+  .invtable{border-collapse:collapse}
+  .invtable thead{display:table-header-group}
+  .invtable tfoot{display:table-footer-group}
+  .invtable tr,.invtable td,.invtable th{break-inside:avoid;page-break-inside:avoid}
+  .inv-header,.billrow,.statusbalance,.balance,.bottomgrid,.notebox,.summary,.paymentgrid,.footer{break-inside:avoid;page-break-inside:avoid}
+  .footer{display:none}
+  /* Force background colors/fills to print consistently across Chrome, Edge,
+     Firefox and Safari without relying on the browser's own "Background
+     graphics" checkbox. */
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact;color-adjust:exact}
+}
