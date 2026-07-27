@@ -126,7 +126,26 @@ async function buildInvoiceDocDefinition() {
 
   if (state.sections.status || state.sections.balance) {
     const row = [];
-    row.push(state.sections.status ? { width: "auto", table: { body: [[{ text: "● " + status, fontSize: 9, bold: true, color: statusColors[0], fillColor: statusColors[1], margin: [8, 4, 8, 4] }]] }, layout: "noBorders" } : { width: "auto", text: "" });
+    row.push(state.sections.status ? {
+      width: "auto",
+      table: {
+        body: [[{
+          // pdfmake's embedded Roboto font subset doesn't include the "●"
+          // glyph (U+25CF), so it silently disappears in the PDF even though
+          // it renders fine on screen/print via the browser's own fonts.
+          // Drawing the dot with pdfmake's canvas primitive instead sidesteps
+          // font glyph coverage entirely.
+          columns: [
+            { width: 7, canvas: [{ type: "ellipse", x: 3.5, y: 5, r1: 3.5, r2: 3.5, color: statusColors[0] }] },
+            { width: "auto", text: status, fontSize: 9, bold: true, color: statusColors[0], margin: [3, 0, 0, 0] }
+          ],
+          columnGap: 0,
+          fillColor: statusColors[1],
+          margin: [8, 4, 8, 4]
+        }]]
+      },
+      layout: "noBorders"
+    } : { width: "auto", text: "" });
     row.push(state.sections.balance ? { width: "*", table: { widths: ["*", "auto"], body: [[{ text: "Balance due", fontSize: 11, bold: true, color: "#101828", fillColor: tint(accent, 0.92), margin: [10, 7, 4, 7] }, { text: money(t.total), fontSize: 16, bold: true, color: accent, alignment: "right", fillColor: tint(accent, 0.92), margin: [4, 7, 10, 7] }]] }, layout: "noBorders" } : { width: "*", text: "" });
     content.push({ columns: row, columnGap: 14, margin: [0, 6, 0, 10] });
   }
