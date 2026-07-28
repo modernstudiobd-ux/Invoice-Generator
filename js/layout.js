@@ -97,6 +97,25 @@ drawerItems.forEach(btn => btn.addEventListener("click", () => {
   closeDrawer();
 }));
 
+// Invoice actions (Save / Duplicate / History / New invoice): on phone widths
+// these move into the hamburger drawer instead of sitting in a row above the
+// preview, where they wrapped onto multiple lines and ate vertical space.
+// Desktop/tablet keep the original row above the canvas, untouched.
+const invoiceToolbar = $("invoiceToolbar"), invoiceToolbarAnchor = $("invoiceToolbarAnchor"), invoiceToolbarSlot = $("invoiceToolbarSlot");
+const phoneQuery = window.matchMedia("(max-width:640px)");
+function placeInvoiceToolbar(isPhone) {
+  if (isPhone) invoiceToolbarSlot.appendChild(invoiceToolbar);
+  else invoiceToolbarAnchor.after(invoiceToolbar);
+}
+placeInvoiceToolbar(phoneQuery.matches);
+phoneQuery.addEventListener("change", e => placeInvoiceToolbar(e.matches));
+
+// Tapping Save/Duplicate/New invoice inside the drawer should feel like a
+// normal menu action: perform it, then dismiss the drawer.
+["saveInvoiceBtn", "duplicateInvoiceBtn", "newInvoiceBtn"].forEach(id => {
+  $(id).addEventListener("click", () => { if (phoneQuery.matches) closeDrawer(); });
+});
+
 // Fullscreen preview: hides all mobile chrome and gives the invoice the full viewport.
 const expandPreviewBtn = $("expandPreviewBtn"), exitFullscreenBtn = $("exitFullscreenBtn");
 function setFullscreenPreview(on) {
@@ -128,13 +147,23 @@ const historyToggleBtn = $("historyToggleBtn"), historyPanel = $("historyPanel")
 export function closeHistoryPanel() {
   historyPanel.classList.remove("open");
   historyToggleBtn.setAttribute("aria-expanded", "false");
+  if (phoneQuery.matches && !mobileDrawer.classList.contains("open")) drawerOverlay.classList.remove("show");
 }
 historyToggleBtn.addEventListener("click", e => {
   e.stopPropagation();
   const open = historyPanel.classList.toggle("open");
   historyToggleBtn.setAttribute("aria-expanded", open ? "true" : "false");
+  // On phone widths the panel opens as its own centered card (the drawer is
+  // too narrow to anchor a dropdown under the button), so hide the sections
+  // drawer but keep a dimmed backdrop behind the card.
+  if (phoneQuery.matches) {
+    mobileDrawer.classList.remove("open");
+    hamburgerBtn.setAttribute("aria-expanded", "false");
+    drawerOverlay.classList.toggle("show", open);
+  }
 });
 document.addEventListener("click", e => { const path = e.composedPath(); if (!path.includes(historyPanel) && !path.includes(historyToggleBtn)) closeHistoryPanel(); });
+drawerOverlay.addEventListener("click", closeHistoryPanel);
 
 // Collapsible sections — tap a panel heading to expand/collapse (mobile width only;
 // inert elsewhere since the CSS effect itself is gated to the ≤640px breakpoint).

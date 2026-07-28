@@ -85,6 +85,24 @@
   .drawer-item:hover{background:#f4f6f9}
   .drawer-item.active{background:rgba(var(--accent-rgb),.08);color:var(--accent);border-color:rgba(var(--accent-rgb),.16)}
 
+  /* Invoice actions (Save / Duplicate / History / New invoice) live inside
+     the drawer on phone widths instead of a cramped row above the preview. */
+  .drawer-divider{height:1px;background:var(--line);margin:12px 2px 10px;flex:none}
+  .drawer-section-label{font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.03em;margin:0 2px 8px}
+  .drawer-toolbar-slot{display:flex;flex-direction:column;gap:2px}
+  .drawer-toolbar-slot .invoice-toolbar{width:auto;max-width:none;margin:0}
+  .drawer-toolbar-slot .invoice-toolbar-actions{flex-direction:column;gap:2px;flex-wrap:nowrap;justify-content:flex-start}
+  .drawer-toolbar-slot .invoice-toolbar-actions .btn{display:flex;align-items:center;gap:10px;width:100%;justify-content:flex-start;text-align:left;background:transparent;border-color:transparent;box-shadow:none;font-size:13.5px;font-weight:750;padding:11px 10px;border-radius:10px;min-height:0}
+  .drawer-toolbar-slot .invoice-toolbar-actions .btn:hover{background:#f4f6f9}
+  .drawer-toolbar-slot .invoice-toolbar-actions .btn.primary{background:rgba(var(--accent-rgb),.08);color:var(--accent);border-color:transparent}
+  .drawer-toolbar-slot .invoice-toolbar-actions .btn.primary:hover{background:rgba(var(--accent-rgb),.14)}
+  .drawer-toolbar-slot .history-dropdown{width:100%}
+  .drawer-toolbar-slot #historyToggleBtn{width:100%}
+
+  /* The History panel opens as its own centered card on phone widths — the
+     drawer is too narrow to anchor a dropdown under the button. */
+  .history-panel{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:min(360px,calc(100vw - 32px));max-height:75vh;z-index:55}
+
   /* Fullscreen preview — hides all chrome and gives the invoice the entire
      viewport, with a single floating close button to get back. */
   .fullscreen-exit{display:none}

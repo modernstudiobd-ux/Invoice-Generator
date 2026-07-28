@@ -39,6 +39,9 @@
   <button class="drawer-item active" data-tab="design" type="button">🎨&nbsp; Design</button>
   <button class="drawer-item" data-tab="details" type="button">📄&nbsp; Details</button>
   <button class="drawer-item" data-tab="items" type="button">📋&nbsp; Items</button>
+  <div class="drawer-divider"></div>
+  <div class="drawer-section-label">Invoice actions</div>
+  <div class="drawer-toolbar-slot" id="invoiceToolbarSlot"></div>
 </nav>
 <button class="fullscreen-exit" id="exitFullscreenBtn" aria-label="Exit fullscreen preview" title="Exit fullscreen">✕</button>
 <div class="app" id="appRoot">
@@ -251,7 +254,8 @@
 <button class="sidebar-toggle" id="sidebarToggleBtn" title="Collapse sidebar" aria-label="Collapse sidebar">‹</button>
 
 <main class="workspace">
- <div class="invoice-toolbar">
+ <div id="invoiceToolbarAnchor"></div>
+ <div class="invoice-toolbar" id="invoiceToolbar">
    <div class="invoice-toolbar-actions">
      <button class="btn small primary" id="saveInvoiceBtn" title="Save a reopenable snapshot to History">💾 Save</button>
      <button class="btn small" id="duplicateInvoiceBtn" title="Save a copy with the next invoice number and today's dates">⧉ Duplicate</button>
