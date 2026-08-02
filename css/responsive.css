@@ -7,7 +7,7 @@
   .mobileview-toggle{display:flex;align-items:center;gap:8px;position:sticky;top:0;z-index:15;background:#fff;padding:9px 10px;border-bottom:1px solid var(--line);padding-top:calc(9px + env(safe-area-inset-top))}
   .mobileview-toggle .view-switch{display:flex;flex:1 1 auto;gap:6px}
   .mobileview-toggle .btn{flex:1 1 0;text-align:center}
-  .mobileview-toggle .btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
+  .mobileview-toggle .btn.active{background:var(--app-accent);border-color:var(--app-accent);color:#fff}
   #appRoot.view-edit .workspace{display:none}
   #appRoot.view-preview .sidebar{display:none}
   .tabs{display:none}
@@ -83,7 +83,7 @@
   .drawer-head strong{font-size:14px}
   .drawer-item{display:flex;align-items:center;gap:10px;width:100%;text-align:left;border:1px solid transparent;background:transparent;border-radius:10px;padding:11px 10px;font-size:13.5px;font-weight:750;color:var(--ink)}
   .drawer-item:hover{background:#f4f6f9}
-  .drawer-item.active{background:rgba(var(--accent-rgb),.08);color:var(--accent);border-color:rgba(var(--accent-rgb),.16)}
+  .drawer-item.active{background:rgba(var(--app-accent-rgb),.08);color:var(--app-accent);border-color:rgba(var(--app-accent-rgb),.16)}
 
   /* Invoice actions (Save / Duplicate / History / New invoice) live inside
      the drawer on phone widths instead of a cramped row above the preview. */
@@ -94,8 +94,8 @@
   .drawer-toolbar-slot .invoice-toolbar-actions{flex-direction:column;gap:2px;flex-wrap:nowrap;justify-content:flex-start}
   .drawer-toolbar-slot .invoice-toolbar-actions .btn{display:flex;align-items:center;gap:10px;width:100%;justify-content:flex-start;text-align:left;background:transparent;border-color:transparent;box-shadow:none;font-size:13.5px;font-weight:750;padding:11px 10px;border-radius:10px;min-height:0}
   .drawer-toolbar-slot .invoice-toolbar-actions .btn:hover{background:#f4f6f9}
-  .drawer-toolbar-slot .invoice-toolbar-actions .btn.primary{background:rgba(var(--accent-rgb),.08);color:var(--accent);border-color:transparent}
-  .drawer-toolbar-slot .invoice-toolbar-actions .btn.primary:hover{background:rgba(var(--accent-rgb),.14)}
+  .drawer-toolbar-slot .invoice-toolbar-actions .btn.primary{background:rgba(var(--app-accent-rgb),.08);color:var(--app-accent);border-color:transparent}
+  .drawer-toolbar-slot .invoice-toolbar-actions .btn.primary:hover{background:rgba(var(--app-accent-rgb),.14)}
   .drawer-toolbar-slot .history-dropdown{width:100%}
   .drawer-toolbar-slot #historyToggleBtn{width:100%}
 

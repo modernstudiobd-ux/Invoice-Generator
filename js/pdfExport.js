@@ -273,6 +273,20 @@ async function buildInvoiceDocDefinition() {
   const tpl = $("template").value;
   const accent = $("accentHex").value || DEFAULT_ACCENT;
   const theme = themeFor(tpl, accent);
+
+  // Optional overrides (Total due / Header / Invoice area / Footer background)
+  // — same hex fields the live preview reads, empty means "use the template's
+  // own default" and is left untouched here.
+  const validHex = v => /^#[0-9a-f]{6}$/i.test(v || "");
+  const totalOverride = $("totalColorHex").value.trim();
+  const headerOverride = $("headerColorHex").value.trim();
+  const invoiceOverride = $("invoiceColorHex").value.trim();
+  const footerOverride = $("footerColorHex").value.trim();
+  if (validHex(totalOverride)) theme.balance.textColor = totalOverride;
+  if (validHex(headerOverride) && (theme.headerMode === "band")) theme.bandColor = headerOverride;
+  if (validHex(invoiceOverride)) theme.pageBg = invoiceOverride;
+  if (validHex(footerOverride)) theme.footerBg = footerOverride;
+
   const marginMm = theme.margin;
   const marginLeftMm = theme.marginLeft ?? marginMm;
   const margin = mmToPt(marginMm);
@@ -456,7 +470,9 @@ async function buildInvoiceDocDefinition() {
     pageSize: paper.pdfName,
     pageMargins: [marginLeft, margin, margin, margin],
     background: theme.pageBg ? ((currentPage, pageSize) => ({ canvas: [{ type: "rect", x: 0, y: 0, w: pageSize.width, h: pageSize.height, color: theme.pageBg }] })) : undefined,
-    footer: state.sections.footer ? ((currentPage, pageCount) => ({ columns: [{ text: companyName, fontSize: 7.5, color: theme.body.muted, margin: [marginLeft, 0, 0, 0] }, { text: "Invoice #" + invNo + (pageCount > 1 ? "  ·  Page " + currentPage + " of " + pageCount : ""), fontSize: 7.5, color: theme.body.muted, alignment: "right", margin: [0, 0, margin, 0] }] })) : undefined,
+    footer: state.sections.footer ? ((currentPage, pageCount) => theme.footerBg
+      ? { table: { widths: ["*"], body: [[{ fillColor: theme.footerBg, margin: [marginLeft, 6, margin, 6], columns: [{ text: companyName, fontSize: 7.5, color: theme.body.muted }, { text: "Invoice #" + invNo + (pageCount > 1 ? "  ·  Page " + currentPage + " of " + pageCount : ""), fontSize: 7.5, color: theme.body.muted, alignment: "right" }] }]] }, layout: "noBorders" }
+      : { columns: [{ text: companyName, fontSize: 7.5, color: theme.body.muted, margin: [marginLeft, 0, 0, 0] }, { text: "Invoice #" + invNo + (pageCount > 1 ? "  ·  Page " + currentPage + " of " + pageCount : ""), fontSize: 7.5, color: theme.body.muted, alignment: "right", margin: [0, 0, margin, 0] }] }) : undefined,
     content,
     defaultStyle: { font: "Roboto", fontSize: 10, color: theme.body.text }
   };

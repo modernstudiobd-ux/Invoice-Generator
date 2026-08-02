@@ -8,7 +8,7 @@
 .template-classic .invtitle h2{font-size:28px;font-weight:700;letter-spacing:.1em}
 .template-classic .status{border-radius:2px;border-color:#1f2937;background:#fff;color:#1f2937}
 .template-classic .balance{background:#fff;border:1px solid #1f2937;border-radius:0}
-.template-classic .balance strong{color:#1f2937}
+.template-classic .balance strong{color:var(--total-color,#1f2937)}
 .template-classic .invtable th{background:#1f2937;color:#fff;border-color:#1f2937;font-family:Georgia,"Times New Roman",serif;font-weight:700}
 .template-classic .invtable td{border-color:#c9cdd3;font-family:Georgia,"Times New Roman",serif}
 .template-classic .summary{border-top:2px solid #1f2937}
@@ -46,7 +46,7 @@
 .template-apple .invno{color:#86868b;font-weight:500}
 .template-apple .metatable td:first-child{color:#86868b}
 .template-apple .balance{background:#f5f5f7;border:0;border-radius:14px}
-.template-apple .balance strong{color:var(--template-accent)}
+.template-apple .balance strong{color:var(--total-color,var(--template-accent))}
 .template-apple .status{border-radius:999px}
 .template-apple .billrow{border-top:1px solid #e5e5e7;border-bottom:1px solid #e5e5e7;padding:12px 0;margin:18px 0}
 .template-apple .invtable th{background:transparent;border:0;border-bottom:1px solid #1d1d1f;color:#86868b;font-weight:600;letter-spacing:.02em}
@@ -59,7 +59,7 @@
 /* Corporate — full-bleed navy header banner, bold uppercase type, square
    edges: the buttoned-up look of a formal B2B letterhead. */
 .invoice.template-corporate{font-family:Arial,Helvetica,sans-serif}
-.template-corporate .inv-header{background:#0b2545;margin:-12mm -12mm 16px;padding:12mm 12mm 16px;border-bottom:3px solid var(--template-accent)}
+.template-corporate .inv-header{background:var(--header-bg,#0b2545);margin:-12mm -12mm 16px;padding:12mm 12mm 16px;border-bottom:3px solid var(--template-accent)}
 .template-corporate .companyname{color:#fff;font-size:17px;text-transform:uppercase;letter-spacing:.05em;font-weight:800}
 .template-corporate .metaText{color:#a9b7d1}
 .template-corporate .logobox:not(.has-logo){background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.25)}
@@ -68,7 +68,7 @@
 .template-corporate .metatable td:first-child{color:#a9b7d1}
 .template-corporate .metatable td:last-child{color:#fff}
 .template-corporate .balance{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.3);border-radius:4px}
-.template-corporate .balance strong{color:#fff}
+.template-corporate .balance strong{color:var(--total-color,#fff)}
 .template-corporate .status{border-radius:3px}
 .template-corporate .billrow{margin:16px 0}
 .template-corporate .label{color:#0b2545;font-weight:800}
@@ -79,7 +79,7 @@
 
 /* Luxury — black canvas, gold rule work, wide-tracked serif caps: a
    boutique atelier invoice rather than an accounting document. */
-.invoice.template-luxury{font-family:Georgia,"Times New Roman",serif;background:#0c0c0c;color:#f3ede2;padding:18mm 16mm}
+.invoice.template-luxury{font-family:Georgia,"Times New Roman",serif;background:var(--invoice-bg,#0c0c0c);color:#f3ede2;padding:18mm 16mm}
 .template-luxury .companyname{color:#f3ede2;text-transform:uppercase;letter-spacing:.14em;font-size:15px;font-weight:400}
 .template-luxury .metaText{color:#b8ab8f}
 .template-luxury .logobox:not(.has-logo){background:transparent;border:1px solid #b08d57}
@@ -90,7 +90,7 @@
 .template-luxury .metatable td:last-child{color:#f3ede2}
 .template-luxury .inv-header{border-bottom:1px solid #b08d57;padding-bottom:14px}
 .template-luxury .balance{background:transparent;border:1px solid #b08d57;border-radius:0}
-.template-luxury .balance strong{color:var(--template-accent)}
+.template-luxury .balance strong{color:var(--total-color,var(--template-accent))}
 .template-luxury .status{border-radius:0}
 .template-luxury .label{color:#8a7c62;letter-spacing:.14em}
 .template-luxury .clientname{color:#f3ede2}
@@ -114,7 +114,7 @@
 .template-agency .invno{font-weight:800;color:#111}
 .template-agency .status{border-radius:4px}
 .template-agency .balance{background:#111;border:0;border-radius:6px}
-.template-agency .balance strong{color:var(--template-accent)}
+.template-agency .balance strong{color:var(--total-color,var(--template-accent))}
 .template-agency .label{font-weight:900;letter-spacing:.02em}
 .template-agency .invtable th{background:#111;color:#fff;border-color:#111;font-weight:800}
 .template-agency .invtable td{border-color:#e4e7ec}
@@ -132,7 +132,7 @@
 .template-construction .invtitle h2{font-weight:900;font-size:30px;color:#1f2430;letter-spacing:.02em}
 .template-construction .invno{font-weight:800;color:#1f2430}
 .template-construction .balance{background:#1f2430;border-radius:2px}
-.template-construction .balance strong{color:var(--template-accent)}
+.template-construction .balance strong{color:var(--total-color,var(--template-accent))}
 .template-construction .status{border-radius:2px;font-weight:900}
 .template-construction .label{color:#1f2430;font-weight:900}
 .template-construction .invtable th{background:#1f2430;color:#f2b705;border-color:#1f2430;font-weight:900;text-transform:uppercase}
@@ -143,7 +143,7 @@
 /* Medical — clinical whites, a soft rounded teal wash behind the header,
    pill-shaped chips: calm and trustworthy rather than transactional. */
 .invoice.template-medical{font-family:"Segoe UI",Arial,sans-serif;padding:14mm}
-.template-medical .inv-header{background:#f4fbfa;margin:-14mm -14mm 16px;padding:14mm 14mm 16px;border-radius:0 0 20px 20px}
+.template-medical .inv-header{background:var(--header-bg,#f4fbfa);margin:-14mm -14mm 16px;padding:14mm 14mm 16px;border-radius:0 0 20px 20px}
 .template-medical .companyname{color:#0f6a63;font-size:17px;font-weight:700}
 .template-medical .metaText{color:#5b7d79}
 .template-medical .logobox:not(.has-logo){border-radius:50%;background:#e3f5f2;border:1px solid #bfe6df}
@@ -152,7 +152,7 @@
 .template-medical .invno{color:#5b7d79}
 .template-medical .metatable td:first-child{color:#5b7d79}
 .template-medical .balance{background:#e3f5f2;border:1px solid #bfe6df;border-radius:14px}
-.template-medical .balance strong{color:var(--template-accent)}
+.template-medical .balance strong{color:var(--total-color,var(--template-accent))}
 .template-medical .status{border-radius:999px}
 .template-medical .billrow{margin:16px 0}
 .template-medical .label{color:#5b7d79}
@@ -174,7 +174,7 @@
 .template-legal .metatable{max-width:320px;margin:8px auto 0}
 .template-legal .statusbalance{align-items:center}
 .template-legal .balance{border:1px solid #1f2937;border-radius:0;background:#fff}
-.template-legal .balance strong{color:var(--template-accent)}
+.template-legal .balance strong{color:var(--total-color,var(--template-accent))}
 .template-legal .status{border-radius:0}
 .template-legal .billrow{text-align:center;margin:16px 0;border-top:1px solid #d0d5dd;border-bottom:1px solid #d0d5dd;padding:10px 0}
 .template-legal .invtable th{background:transparent;border:0;border-top:2px solid #1f2937;border-bottom:1px solid #1f2937;font-weight:700}
@@ -193,7 +193,7 @@
 .template-realestate .invno{font-family:"Segoe UI",Arial,sans-serif;color:#6b6558}
 .template-realestate .metatable{font-family:"Segoe UI",Arial,sans-serif}
 .template-realestate .balance{background:#faf7f0;border:1px solid #e5ddc8;border-radius:2px}
-.template-realestate .balance strong{color:var(--template-accent)}
+.template-realestate .balance strong{color:var(--total-color,var(--template-accent))}
 .template-realestate .status{border-radius:2px}
 .template-realestate .billrow{margin:16px 0;padding:12px;background:#faf7f0;border:1px solid #e5ddc8}
 .template-realestate .label{font-family:"Segoe UI",Arial,sans-serif;color:#8a6d3b}
@@ -210,7 +210,7 @@
 .template-freelancer .logofallback{border-radius:50%}
 .template-freelancer .invtitle h2{font-weight:700;font-size:30px;color:var(--template-accent)}
 .template-freelancer .balance{border-radius:20px;background:rgba(var(--accent-rgb),.06);border:1px solid rgba(var(--accent-rgb),.16)}
-.template-freelancer .balance strong{color:var(--template-accent)}
+.template-freelancer .balance strong{color:var(--total-color,var(--template-accent))}
 .template-freelancer .status{border-radius:999px}
 .template-freelancer .billrow{margin:16px 0}
 .template-freelancer .invtable th{background:rgba(var(--accent-rgb),.08);border:0;color:var(--template-accent);font-weight:700}
@@ -220,7 +220,7 @@
 
 /* Restaurant — a menu card: dashed olive rules, warm ivory ground, serif
    item names, the register of a printed dinner menu, not an invoice. */
-.invoice.template-restaurant{font-family:Georgia,serif;padding:14mm;background:#fbf9f4}
+.invoice.template-restaurant{font-family:Georgia,serif;padding:14mm;background:var(--invoice-bg,#fbf9f4)}
 .template-restaurant .inv-header{border-bottom:2px dashed #4b5320;padding-bottom:12px}
 .template-restaurant .companyname{font-weight:700;color:#3c3a2f}
 .template-restaurant .metaText{font-family:"Segoe UI",Arial,sans-serif;color:#7a7563}
@@ -229,7 +229,7 @@
 .template-restaurant .invtitle h2{font-weight:700;letter-spacing:.06em;color:#4b5320}
 .template-restaurant .invno{font-family:"Segoe UI",Arial,sans-serif;color:#7a7563}
 .template-restaurant .balance{background:#fff;border:1px dashed #4b5320;border-radius:8px}
-.template-restaurant .balance strong{color:var(--template-accent)}
+.template-restaurant .balance strong{color:var(--total-color,var(--template-accent))}
 .template-restaurant .status{border-radius:999px}
 .template-restaurant .billrow{margin:16px 0}
 .template-restaurant .label{font-family:"Segoe UI",Arial,sans-serif;color:#7a7563}
@@ -248,7 +248,7 @@
 .template-retail .invtitle h2{font-weight:900;font-size:30px;text-transform:uppercase;letter-spacing:.04em}
 .template-retail .invno{font-weight:800}
 .template-retail .balance{background:var(--template-accent);border-radius:0;clip-path:polygon(0 0,94% 0,100% 50%,94% 100%,0 100%)}
-.template-retail .balance strong,.template-retail .balance span{color:#fff}
+.template-retail .balance strong{color:var(--total-color,#fff)}.template-retail .balance span{color:#fff}
 .template-retail .status{border-radius:0;font-weight:900}
 .template-retail .label{font-weight:900;text-transform:uppercase}
 .template-retail .invtable th{background:#111;color:#fff;border-color:#111;font-weight:900;text-transform:uppercase}
@@ -266,7 +266,7 @@
 .template-technology .invno{font-family:"SFMono-Regular",Consolas,"Courier New",monospace;background:#0b0e14;color:#7ee7c7;padding:2px 6px;border-radius:4px;font-size:12px}
 .template-technology .metatable{font-family:"SFMono-Regular",Consolas,"Courier New",monospace;font-size:10px}
 .template-technology .balance{border-radius:8px;background:#0b0e14}
-.template-technology .balance strong{color:var(--template-accent)}
+.template-technology .balance strong{color:var(--total-color,var(--template-accent))}
 .template-technology .balance span{color:#9aa1ac}
 .template-technology .status{border-radius:6px}
 .template-technology .invtable th{background:#0b0e14;color:#e6e8eb;border-color:#0b0e14;font-family:"SFMono-Regular",Consolas,"Courier New",monospace;font-weight:600;font-size:8px}
@@ -285,7 +285,7 @@
 .template-manufacturing .metatable{border:1px solid #c3ccd6}
 .template-manufacturing .metatable td{border-bottom:1px solid #dde2e8;padding:4px 6px}
 .template-manufacturing .balance{background:#eceff2;border:2px solid #384250;border-radius:0}
-.template-manufacturing .balance strong{color:var(--template-accent)}
+.template-manufacturing .balance strong{color:var(--total-color,var(--template-accent))}
 .template-manufacturing .status{border-radius:0;font-weight:800}
 .template-manufacturing .billrow{border:1px solid #c3ccd6;padding:10px;margin:14px 0}
 .template-manufacturing .invtable th{background:#384250;color:#fff;border:1px solid #384250;font-weight:800;text-transform:uppercase;font-size:8px}
@@ -295,7 +295,7 @@
 
 /* Dark Mode — a flat, cool dark UI: near-black surfaces, a single accent
    glow under the header, for teams who work (and bill) after hours. */
-.invoice.template-dark{font-family:Inter,"Segoe UI",Arial,sans-serif;background:#111318;color:#e6e8eb;padding:14mm}
+.invoice.template-dark{font-family:Inter,"Segoe UI",Arial,sans-serif;background:var(--invoice-bg,#111318);color:#e6e8eb;padding:14mm}
 .template-dark .inv-header{border-bottom:1px solid #2a2e37;padding-bottom:14px;position:relative}
 .template-dark .inv-header::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--template-accent);opacity:.6}
 .template-dark .companyname{color:#fff}
@@ -306,7 +306,7 @@
 .template-dark .metatable td:first-child{color:#9aa1ac}
 .template-dark .metatable td:last-child{color:#fff}
 .template-dark .balance{background:rgba(var(--accent-rgb),.16);border:1px solid rgba(var(--accent-rgb),.35)}
-.template-dark .balance strong{color:var(--template-accent)}
+.template-dark .balance strong{color:var(--total-color,var(--template-accent))}
 .template-dark .label{color:#9aa1ac}
 .template-dark .clientname{color:#fff}
 .template-dark .invtable th{background:#1c1f26;border-color:#2a2e37;color:#c7cbd1}

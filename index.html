@@ -256,10 +256,43 @@
       </div>
     </section>
     <section class="panel">
-      <div class="panelhead"><h2>Color</h2><button class="btn small" id="resetColorBtn" type="button">Reset color</button></div>
+      <div class="panelhead"><h2>Color</h2><button class="btn small" id="resetColorBtn" type="button">Reset colors</button></div>
       <div class="grid2">
         <div class="field"><label for="accent">Accent color</label><input id="accent" type="color" value="#18181b"></div>
         <div class="field"><label for="accentHex">Accent HEX</label><input id="accentHex" value="#18181b"></div>
+      </div>
+      <div class="hint" style="margin:8px 0 10px">The four settings below are optional overrides — leave the HEX field empty to keep the template's own default.</div>
+      <div class="field">
+        <label for="totalColorHex">Total due color</label>
+        <div class="colorrow">
+          <input id="totalColor" type="color" value="#18181b" aria-label="Total due color swatch">
+          <input id="totalColorHex" type="text" placeholder="Auto (matches accent)" autocomplete="off" spellcheck="false">
+          <button class="btn small icon" id="totalColorClear" type="button" title="Clear override" aria-label="Clear total due color override">✕</button>
+        </div>
+      </div>
+      <div class="field">
+        <label for="headerColorHex">Header background</label>
+        <div class="colorrow">
+          <input id="headerColor" type="color" value="#ffffff" aria-label="Header background swatch">
+          <input id="headerColorHex" type="text" placeholder="Auto (template default)" autocomplete="off" spellcheck="false">
+          <button class="btn small icon" id="headerColorClear" type="button" title="Clear override" aria-label="Clear header background override">✕</button>
+        </div>
+      </div>
+      <div class="field">
+        <label for="invoiceColorHex">Invoice area background</label>
+        <div class="colorrow">
+          <input id="invoiceColor" type="color" value="#ffffff" aria-label="Invoice area background swatch">
+          <input id="invoiceColorHex" type="text" placeholder="Auto (template default)" autocomplete="off" spellcheck="false">
+          <button class="btn small icon" id="invoiceColorClear" type="button" title="Clear override" aria-label="Clear invoice area background override">✕</button>
+        </div>
+      </div>
+      <div class="field">
+        <label for="footerColorHex">Footer background</label>
+        <div class="colorrow">
+          <input id="footerColor" type="color" value="#ffffff" aria-label="Footer background swatch">
+          <input id="footerColorHex" type="text" placeholder="Auto (template default)" autocomplete="off" spellcheck="false">
+          <button class="btn small icon" id="footerColorClear" type="button" title="Clear override" aria-label="Clear footer background override">✕</button>
+        </div>
       </div>
     </section>
     <section class="panel">

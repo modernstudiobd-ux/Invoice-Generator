@@ -3,7 +3,7 @@
 
 import { $, uid } from "./dom.js";
 import { state, fields, defaultColumns, sectionDefs } from "./state.js";
-import { setAccent } from "./accent.js";
+import { setAccent, applyAllOptionalColors } from "./accent.js";
 import { renderColumns } from "./columns.js";
 import { renderItems } from "./items.js";
 import { renderToggles } from "./toggles.js";
@@ -20,5 +20,5 @@ export function load(d) {
   state.columns = cleanColumns.length ? cleanColumns : defaultColumns();
   state.items = Array.isArray(d.items) ? d.items.filter(i => i && typeof i === "object") : [];
   state.sections = { ...Object.fromEntries(sectionDefs.map(x => [x[0], true])), ...(d.sections && typeof d.sections === "object" ? d.sections : {}) };
-  setAccent($("accentHex").value); renderColumns(); renderItems(); renderToggles(); renderPreview(); save();
+  setAccent($("accentHex").value); applyAllOptionalColors(); renderColumns(); renderItems(); renderToggles(); renderPreview(); save();
 }

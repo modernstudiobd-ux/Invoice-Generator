@@ -7,7 +7,7 @@ import { $, uid } from "./dom.js";
 import { state, fields, defaultColumns, KEY, DEFAULT_ACCENT, serialize } from "./state.js";
 import { today, plusDays } from "./format.js";
 import { toast } from "./toast.js";
-import { setAccent } from "./accent.js";
+import { setAccent, applyOptionalColor, clearOptionalColor, applyAllOptionalColors } from "./accent.js";
 import { renderPreview, fitInvoiceCanvas } from "./preview.js";
 import { renderColumns } from "./columns.js";
 import { renderItems } from "./items.js";
@@ -22,9 +22,23 @@ import { initInstallPrompt, registerServiceWorker } from "./install.js";
 import "./layout.js";
 
 /* --- Form field bindings: any change to a tracked field re-renders + autosaves --- */
+const OPTIONAL_COLOR_IDS = ["totalColor", "headerColor", "invoiceColor", "footerColor"];
 fields.forEach(id => {
   let e = $(id), ev = e.tagName === "SELECT" ? "change" : "input";
-  e.addEventListener(ev, () => { if (id === "accent" || id === "accentHex") setAccent(e.value); renderPreview(); save(); });
+  e.addEventListener(ev, () => {
+    if (id === "accent" || id === "accentHex") setAccent(e.value);
+    else if (OPTIONAL_COLOR_IDS.some(base => id === base + "Hex")) applyOptionalColor(id.replace(/Hex$/, ""));
+    renderPreview(); save();
+  });
+});
+
+/* --- Optional color swatches (Total due / Header / Invoice area / Footer):
+   picking a swatch color writes into its paired HEX field (the actual
+   persisted value) and applies it; the ✕ button clears the override so the
+   template's own default takes over again. --- */
+OPTIONAL_COLOR_IDS.forEach(id => {
+  $(id).addEventListener("input", () => { $(id + "Hex").value = $(id).value; applyOptionalColor(id); renderPreview(); save(); });
+  $(id + "Clear").onclick = () => { clearOptionalColor(id); renderPreview(); save(); };
 });
 
 /* --- Items / columns quick actions --- */
@@ -61,7 +75,7 @@ $("logoFile").onchange = e => {
 };
 $("removeLogoBtn").onclick = () => { state.logo = ""; state.logoNatural = null; $("logoFile").value = ""; $("logoHint").textContent = "PNG, JPG, WEBP or SVG. Maximum 3 MB."; renderPreview(); save(); toast("Logo removed."); };
 $("resetLogoSizeBtn").onclick = () => { $("logoHeight").value = naturalLogoHeight(); renderPreview(); save(); toast(state.logoNatural ? "Logo reset to its original size." : "Logo size reset to default."); };
-$("resetColorBtn").onclick = () => { setAccent(DEFAULT_ACCENT); renderPreview(); save(); toast("Accent color reset."); };
+$("resetColorBtn").onclick = () => { setAccent(DEFAULT_ACCENT); OPTIONAL_COLOR_IDS.forEach(clearOptionalColor); renderPreview(); save(); toast("Colors reset."); };
 
 /* --- Print / PDF / JSON export-import / reset --- */
 $("printBtn").onclick = () => printInvoice();
@@ -101,6 +115,7 @@ $("invoiceDate").value = today();
 $("dueDate").value = plusDays(today(), 14);
 if (!$("logoHeight").value) $("logoHeight").value = "48";
 setAccent(DEFAULT_ACCENT);
+applyAllOptionalColors();
 renderColumns(); renderItems(); renderToggles(); renderPreview();
 
 {
