@@ -22,7 +22,7 @@ import { initInstallPrompt, registerServiceWorker } from "./install.js";
 import "./layout.js";
 
 /* --- Form field bindings: any change to a tracked field re-renders + autosaves --- */
-const OPTIONAL_COLOR_IDS = ["totalColor", "headerColor", "invoiceColor", "footerColor"];
+const OPTIONAL_COLOR_IDS = ["totalColor", "headerColor", "headerTextColor", "invoiceColor"];
 fields.forEach(id => {
   let e = $(id), ev = e.tagName === "SELECT" ? "change" : "input";
   e.addEventListener(ev, () => {

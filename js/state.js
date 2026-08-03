@@ -30,7 +30,7 @@ export const state = {
   sections: Object.fromEntries(sectionDefs.map(x => [x[0], true]))
 };
 
-export const fields = ["logoHeight", "invoiceNumber", "status", "invoiceDate", "dueDate", "currency", "reference", "companyName", "companyReg", "companyVat", "companyAddress", "companyPhone", "companyEmail", "companyWebsite", "clientName", "clientContact", "clientTax", "clientAddress", "clientEmail", "discount", "tax", "shipping", "notes", "paymentDetails", "terms", "template", "accent", "accentHex", "totalColorHex", "headerColorHex", "invoiceColorHex", "footerColorHex", "paperSize"];
+export const fields = ["logoHeight", "invoiceNumber", "status", "invoiceDate", "dueDate", "currency", "reference", "companyName", "companyReg", "companyVat", "companyAddress", "companyPhone", "companyEmail", "companyWebsite", "clientName", "clientContact", "clientTax", "clientAddress", "clientEmail", "discount", "tax", "shipping", "notes", "paymentDetails", "terms", "template", "accent", "accentHex", "totalColorHex", "headerColorHex", "headerTextColorHex", "invoiceColorHex", "paperSize"];
 
 export const DEFAULT_ACCENT = "#18181b";
 

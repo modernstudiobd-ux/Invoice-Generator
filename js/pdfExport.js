@@ -71,7 +71,7 @@ function themeFor(tpl, accent) {
     name: { size: 15, bold: true, color: "#101828", case: "none", spacing: 0 },
     body: { text: "#1f2937", muted: "#485568", label: "#667085" },
     rule: { color: null, width: 0, dash: false, double: false },
-    balance: { mode: "fill", fill: tint(accent, 0.92), border: null, textColor: accent, labelColor: "#101828" },
+    balance: { mode: "fill", fill: tint(accent, 0.92), border: null, textColor: "#18181b", labelColor: "#101828" },
     table: { headerFill: tint(accent, 0.94), headerColor: "#344054", border: "#d7dde6", grid: true },
     invnoChip: null
   };
@@ -99,7 +99,7 @@ function themeFor(tpl, accent) {
       title: { size: 20, bold: false, color: accent },
       name: { size: 13, bold: true },
       rule: { color: "#1f2937", width: 2 },
-      balance: { mode: "plain", border: accent, textColor: accent, labelColor: "#101828" },
+      balance: { mode: "plain", border: accent, textColor: "#18181b", labelColor: "#101828" },
       table: { headerFill: null, headerColor: "#1f2937", border: "#e4e7ec", grid: false }
     });
     case "apple": return merge({
@@ -107,14 +107,14 @@ function themeFor(tpl, accent) {
       title: { size: 34, bold: false, color: accent },
       name: { size: 14, bold: false, color: "#1d1d1f" },
       body: { text: "#1d1d1f", muted: "#86868b", label: "#86868b" },
-      balance: { mode: "fill", fill: "#f5f5f7", textColor: accent, labelColor: "#1d1d1f" },
+      balance: { mode: "fill", fill: "#f5f5f7", textColor: "#18181b", labelColor: "#1d1d1f" },
       table: { headerFill: null, headerColor: "#86868b", border: "#e5e5e7", grid: false }
     });
     case "freelancer": return merge({
       margin: 14,
       title: { size: 30, bold: true, color: accent },
       name: { size: 15, bold: true, color: "#1f2937" },
-      balance: { mode: "fill", fill: tint(accent, 0.9), border: tint(accent, 0.7), textColor: accent, labelColor: "#101828" },
+      balance: { mode: "fill", fill: tint(accent, 0.9), border: tint(accent, 0.7), textColor: "#18181b", labelColor: "#101828" },
       table: { headerFill: tint(accent, 0.9), headerColor: accent, border: "#eef0f3", grid: false }
     });
     case "dark": return merge({
@@ -123,7 +123,7 @@ function themeFor(tpl, accent) {
       name: { size: 15, bold: true, color: "#ffffff" },
       body: { text: "#e6e8eb", muted: "#9aa1ac", label: "#9aa1ac" },
       rule: { color: accent, width: 2 },
-      balance: { mode: "fill", fill: "#1c2230", border: tint(accent, 0.2), textColor: accent, labelColor: "#e6e8eb" },
+      balance: { mode: "fill", fill: "#1c2230", border: tint(accent, 0.2), textColor: "#ffffff", labelColor: "#e6e8eb" },
       table: { headerFill: "#1c1f26", headerColor: "#c7cbd1", border: "#2a2e37", grid: true }
     });
     case "luxury": return merge({
@@ -149,7 +149,7 @@ function themeFor(tpl, accent) {
       title: { size: 38, bold: true, color: "#111111", spacing: -0.3 },
       name: { size: 18, bold: true, color: "#111111" },
       rule: { color: "#111111", width: 3 },
-      balance: { mode: "fill", fill: "#111111", textColor: accent, labelColor: "#ffffff" },
+      balance: { mode: "fill", fill: "#111111", textColor: "#ffffff", labelColor: "#ffffff" },
       table: { headerFill: "#111111", headerColor: "#ffffff", border: "#e4e7ec", grid: true }
     });
     case "construction": return merge({
@@ -165,7 +165,7 @@ function themeFor(tpl, accent) {
       title: { size: 24, bold: false, color: "#0f6a63" },
       name: { size: 16, bold: true, color: "#0f6a63" },
       body: { text: "#1f2937", muted: "#5b7d79", label: "#5b7d79" },
-      balance: { mode: "fill", fill: "#e3f5f2", border: "#bfe6df", textColor: accent, labelColor: "#0f6a63" },
+      balance: { mode: "fill", fill: "#e3f5f2", border: "#bfe6df", textColor: "#0f6a63", labelColor: "#0f6a63" },
       table: { headerFill: "#e3f5f2", headerColor: "#0f6a63", border: "#dcece9", grid: true }
     });
     case "legal": return merge({
@@ -183,7 +183,7 @@ function themeFor(tpl, accent) {
       name: { size: 17, bold: true, color: "#2b2b28" },
       body: { text: "#2b2b28", muted: "#6b6558", label: "#8a6d3b" },
       rule: { color: "#d9d2c3", width: 1 },
-      balance: { mode: "fill", fill: "#faf7f0", border: "#e5ddc8", textColor: accent, labelColor: "#2b2b28" },
+      balance: { mode: "fill", fill: "#faf7f0", border: "#e5ddc8", textColor: "#2b2b28", labelColor: "#2b2b28" },
       table: { headerFill: "#faf7f0", headerColor: "#6b6558", border: "#eee8d9", grid: true }
     });
     case "restaurant": return merge({
@@ -192,7 +192,7 @@ function themeFor(tpl, accent) {
       name: { size: 15, bold: true, color: "#3c3a2f" },
       body: { text: "#3c3a2f", muted: "#7a7563", label: "#7a7563" },
       rule: { color: "#4b5320", width: 1.5, dash: true },
-      balance: { mode: "outline", border: "#4b5320", textColor: accent, labelColor: "#3c3a2f" },
+      balance: { mode: "outline", border: "#4b5320", textColor: "#4b5320", labelColor: "#3c3a2f" },
       table: { headerFill: null, headerColor: "#4b5320", border: "#d8d3c2", grid: false }
     });
     case "retail": return merge({
@@ -208,7 +208,7 @@ function themeFor(tpl, accent) {
       title: { size: 24, bold: true, color: "#0b0e14", spacing: -0.2 },
       name: { size: 15, bold: true, color: "#0b0e14" },
       invnoChip: { fill: "#0b0e14", color: "#7ee7c7" },
-      balance: { mode: "fill", fill: "#0b0e14", textColor: accent, labelColor: "#9aa1ac" },
+      balance: { mode: "fill", fill: "#0b0e14", textColor: "#7ee7c7", labelColor: "#9aa1ac" },
       table: { headerFill: "#0b0e14", headerColor: "#e6e8eb", border: "#e4e7ec", grid: true }
     });
     case "manufacturing": return merge({
@@ -216,7 +216,7 @@ function themeFor(tpl, accent) {
       title: { size: 22, bold: true, color: "#1f2733", case: "upper" },
       name: { size: 15, bold: true, color: "#1f2733", case: "upper" },
       body: { text: "#1f2733", muted: "#384250", label: "#384250" },
-      balance: { mode: "fillOutline", fill: "#eceff2", border: "#384250", textColor: accent, labelColor: "#1f2733" },
+      balance: { mode: "fillOutline", fill: "#eceff2", border: "#384250", textColor: "#1f2733", labelColor: "#1f2733" },
       table: { headerFill: "#384250", headerColor: "#ffffff", border: "#c3ccd6", grid: true }
     });
     default: return merge({}); // modern
@@ -274,18 +274,17 @@ async function buildInvoiceDocDefinition() {
   const accent = $("accentHex").value || DEFAULT_ACCENT;
   const theme = themeFor(tpl, accent);
 
-  // Optional overrides (Total due / Header / Invoice area / Footer background)
-  // — same hex fields the live preview reads, empty means "use the template's
-  // own default" and is left untouched here.
+  // Optional overrides (Total due / Header background / Header text / Invoice
+  // area background) — same hex fields the live preview reads, empty means
+  // "use the template's own default" and is left untouched here.
   const validHex = v => /^#[0-9a-f]{6}$/i.test(v || "");
   const totalOverride = $("totalColorHex").value.trim();
-  const headerOverride = $("headerColorHex").value.trim();
+  const headerBgOverride = $("headerColorHex").value.trim();
+  const headerTextOverride = $("headerTextColorHex").value.trim();
   const invoiceOverride = $("invoiceColorHex").value.trim();
-  const footerOverride = $("footerColorHex").value.trim();
   if (validHex(totalOverride)) theme.balance.textColor = totalOverride;
-  if (validHex(headerOverride) && (theme.headerMode === "band")) theme.bandColor = headerOverride;
+  if (validHex(headerBgOverride) && (theme.headerMode === "band")) theme.bandColor = headerBgOverride;
   if (validHex(invoiceOverride)) theme.pageBg = invoiceOverride;
-  if (validHex(footerOverride)) theme.footerBg = footerOverride;
 
   const marginMm = theme.margin;
   const marginLeftMm = theme.marginLeft ?? marginMm;
@@ -330,13 +329,23 @@ async function buildInvoiceDocDefinition() {
   const termsText = $("terms").value.trim();
   const paymentText = $("paymentDetails").value.trim();
 
+  // Header text color override applies only to header text nodes (company
+  // name/meta, "Invoice" title, invoice #, date/due/reference) — never to
+  // the balance box, BILL TO section, table, or footer, which stay on the
+  // theme's own colors (or their own separate overrides).
+  const hName = headerTextOverride && validHex(headerTextOverride) ? headerTextOverride : theme.name.color;
+  const hTitle = headerTextOverride && validHex(headerTextOverride) ? headerTextOverride : theme.title.color;
+  const hMuted = headerTextOverride && validHex(headerTextOverride) ? headerTextOverride : theme.body.muted;
+  const hLabel = headerTextOverride && validHex(headerTextOverride) ? headerTextOverride : theme.body.label;
+  const hText = headerTextOverride && validHex(headerTextOverride) ? headerTextOverride : theme.body.text;
+
   // Compact-minimal always stacks the logo above the company name (matches
   // the on-screen "Compact Minimal" layout); every other template keeps the
   // logo inline above the name within the same left-hand stack.
   const headerLeft = [
     ...(logoDataUrl ? [{ image: logoDataUrl, fit: [165, logoHeightPt], margin: [0, 0, 0, 8] }] : []),
-    { text: cased(companyName, theme.name.case), bold: theme.name.bold, fontSize: theme.name.size, color: theme.name.color, characterSpacing: theme.name.spacing || 0, margin: [0, 0, 0, 4] },
-    ...(state.sections.company && companyMeta.length ? [{ text: companyMeta.join("\n"), fontSize: 8.5, color: theme.body.muted, lineHeight: 1.25 }] : [])
+    { text: cased(companyName, theme.name.case), bold: theme.name.bold, fontSize: theme.name.size, color: hName, characterSpacing: theme.name.spacing || 0, margin: [0, 0, 0, 4] },
+    ...(state.sections.company && companyMeta.length ? [{ text: companyMeta.join("\n"), fontSize: 8.5, color: hMuted, lineHeight: 1.25 }] : [])
   ];
 
   const metaRows = [];
@@ -346,12 +355,12 @@ async function buildInvoiceDocDefinition() {
 
   const invNoNode = theme.invnoChip
     ? { table: { widths: ["auto"], body: [[{ text: "#" + invNo, fontSize: 10, bold: true, color: theme.invnoChip.color, fillColor: theme.invnoChip.fill, margin: [6, 3, 6, 3] }]] }, layout: "noBorders", alignment: "right", margin: [0, 0, 0, 8] }
-    : { text: "#" + invNo, alignment: "right", fontSize: 12, bold: true, color: theme.body.muted, margin: [0, 0, 0, 8] };
+    : { text: "#" + invNo, alignment: "right", fontSize: 12, bold: true, color: hMuted, margin: [0, 0, 0, 8] };
 
   const headerRight = [
-    { text: cased("Invoice", theme.title.case), alignment: "right", fontSize: theme.title.size, bold: theme.title.bold, color: theme.title.color, characterSpacing: theme.title.spacing || 0, margin: [0, 0, 0, 2] },
+    { text: cased("Invoice", theme.title.case), alignment: "right", fontSize: theme.title.size, bold: theme.title.bold, color: hTitle, characterSpacing: theme.title.spacing || 0, margin: [0, 0, 0, 2] },
     invNoNode,
-    ...metaRows.map(([l, v]) => ({ columns: [{ text: l, fontSize: 9, color: theme.body.label }, { text: v, fontSize: 9, bold: true, alignment: "right", color: theme.body.text }], margin: [0, 1.5, 0, 1.5] }))
+    ...metaRows.map(([l, v]) => ({ columns: [{ text: l, fontSize: 9, color: hLabel }, { text: v, fontSize: 9, bold: true, alignment: "right", color: hText }], margin: [0, 1.5, 0, 1.5] }))
   ];
 
   const content = [];
@@ -470,9 +479,7 @@ async function buildInvoiceDocDefinition() {
     pageSize: paper.pdfName,
     pageMargins: [marginLeft, margin, margin, margin],
     background: theme.pageBg ? ((currentPage, pageSize) => ({ canvas: [{ type: "rect", x: 0, y: 0, w: pageSize.width, h: pageSize.height, color: theme.pageBg }] })) : undefined,
-    footer: state.sections.footer ? ((currentPage, pageCount) => theme.footerBg
-      ? { table: { widths: ["*"], body: [[{ fillColor: theme.footerBg, margin: [marginLeft, 6, margin, 6], columns: [{ text: companyName, fontSize: 7.5, color: theme.body.muted }, { text: "Invoice #" + invNo + (pageCount > 1 ? "  ·  Page " + currentPage + " of " + pageCount : ""), fontSize: 7.5, color: theme.body.muted, alignment: "right" }] }]] }, layout: "noBorders" }
-      : { columns: [{ text: companyName, fontSize: 7.5, color: theme.body.muted, margin: [marginLeft, 0, 0, 0] }, { text: "Invoice #" + invNo + (pageCount > 1 ? "  ·  Page " + currentPage + " of " + pageCount : ""), fontSize: 7.5, color: theme.body.muted, alignment: "right", margin: [0, 0, margin, 0] }] }) : undefined,
+    footer: state.sections.footer ? ((currentPage, pageCount) => ({ columns: [{ text: companyName, fontSize: 7.5, color: theme.body.muted, margin: [marginLeft, 0, 0, 0] }, { text: "Invoice #" + invNo + (pageCount > 1 ? "  ·  Page " + currentPage + " of " + pageCount : ""), fontSize: 7.5, color: theme.body.muted, alignment: "right", margin: [0, 0, margin, 0] }] })) : undefined,
     content,
     defaultStyle: { font: "Roboto", fontSize: 10, color: theme.body.text }
   };

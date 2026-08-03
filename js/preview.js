@@ -4,10 +4,16 @@ import { $, esc } from "./dom.js";
 import { state, currentPaper, applyPaperSize } from "./state.js";
 import { money, dateFmt, alignClass, fmtCell, num } from "./format.js";
 import { calc, itemValue } from "./calc.js";
+import { applyAllOptionalColors } from "./accent.js";
 
 export function renderPreview() {
   let inv = $("invoice"), tpl = $("template").value;
   inv.className = "invoice template-" + tpl;
+  // renderPreview() resets the invoice's className above (to swap the
+  // template class) — that wipes the has-header-bg/has-header-text toggle
+  // classes set by the optional color overrides, so re-derive them here from
+  // the current HEX fields every time a render happens.
+  applyAllOptionalColors();
   applyPaperSize();
   const labels = { title: "INVOICE", bill: "Bill to", status: "Invoice status", balance: "Balance due", note: "Invoice note", payment: "Payment details", terms: "Terms", date: "Invoice date", due: "Due date", ref: "Reference" };
   $("pInvoiceTitle").textContent = labels.title;

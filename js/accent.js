@@ -18,15 +18,15 @@ export function setAccent(v) {
 }
 
 // Optional overrides, independent of the accent color: Total due color, and
-// Header/Invoice area/Footer background. Each pairs a hex text field (the
-// stored value — empty means "no override, use the template's own default")
-// with a color-picker swatch (a convenience input, not itself persisted).
-// All are scoped to #invoice, same as setAccent above.
+// Header background/Header text/Invoice area background. Each pairs a hex
+// text field (the stored value — empty means "no override, use the
+// template's own default") with a color-picker swatch (a convenience input,
+// not itself persisted). All are scoped to #invoice, same as setAccent above.
 const OPTIONAL_COLOR_VARS = {
   totalColor: { cssVar: "--total-color", hostClass: null },
   headerColor: { cssVar: "--header-bg", hostClass: "has-header-bg" },
-  invoiceColor: { cssVar: "--invoice-bg", hostClass: null },
-  footerColor: { cssVar: "--footer-bg", hostClass: "has-footer-bg" }
+  headerTextColor: { cssVar: "--header-text", hostClass: "has-header-text" },
+  invoiceColor: { cssVar: "--invoice-bg", hostClass: null }
 };
 
 export function applyOptionalColor(id) {
