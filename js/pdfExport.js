@@ -339,14 +339,16 @@ async function buildInvoiceDocDefinition() {
   const hLabel = headerTextOverride && validHex(headerTextOverride) ? headerTextOverride : theme.body.label;
   const hText = headerTextOverride && validHex(headerTextOverride) ? headerTextOverride : theme.body.text;
 
-  // Compact-minimal always stacks the logo above the company name (matches
-  // the on-screen "Compact Minimal" layout); every other template keeps the
-  // logo inline above the name within the same left-hand stack.
-  const headerLeft = [
-    ...(logoDataUrl ? [{ image: logoDataUrl, fit: [165, logoHeightPt], margin: [0, 0, 0, 8] }] : []),
-    { text: cased(companyName, theme.name.case), bold: theme.name.bold, fontSize: theme.name.size, color: hName, characterSpacing: theme.name.spacing || 0, margin: [0, 0, 0, 4] },
-    ...(state.sections.company && companyMeta.length ? [{ text: companyMeta.join("\n"), fontSize: 8.5, color: hMuted, lineHeight: 1.25 }] : [])
-  ];
+  // Logo position: "left" (side-by-side with the company name) or "above"
+  // (stacked) — Auto matches the on-screen default (Compact Minimal stacks,
+  // everything else sits side-by-side).
+  const logoPositionOverride = $("logoPosition").value;
+  const logoPosition = logoPositionOverride || (tpl === "compact" ? "above" : "left");
+  const nameBlock = { text: cased(companyName, theme.name.case), bold: theme.name.bold, fontSize: theme.name.size, color: hName, characterSpacing: theme.name.spacing || 0, margin: [0, 0, 0, 4] };
+  const metaBlock = (state.sections.company && companyMeta.length) ? { text: companyMeta.join("\n"), fontSize: 8.5, color: hMuted, lineHeight: 1.25 } : null;
+  const headerLeft = (logoDataUrl && logoPosition === "left")
+    ? [{ columns: [{ width: "auto", image: logoDataUrl, fit: [165, logoHeightPt], margin: [0, 0, 10, 0] }, { width: "*", stack: [nameBlock, ...(metaBlock ? [metaBlock] : [])] }], columnGap: 0 }]
+    : [...(logoDataUrl ? [{ image: logoDataUrl, fit: [165, logoHeightPt], margin: [0, 0, 0, 8] }] : []), nameBlock, ...(metaBlock ? [metaBlock] : [])];
 
   const metaRows = [];
   if (state.sections.invoiceDate) metaRows.push(["Invoice date", dateFmt($("invoiceDate").value)]);
@@ -447,7 +449,8 @@ async function buildInvoiceDocDefinition() {
   if (t.tax && state.sections.tax) summaryRows.push([`Tax (${t.tr.toFixed(2).replace(/\.00$/, "")}%)`, money(t.tax)]);
   if (t.ship && state.sections.shipping) summaryRows.push(["Shipping", money(t.ship)]);
 
-  const notesStack = (state.sections.notes && notesText) ? [{ text: "Invoice note", fontSize: 8, bold: true, color: theme.body.label, margin: [0, 0, 0, 3] }, { text: notesText, fontSize: 9, color: theme.body.text }] : [{ text: "" }];
+  const notesAlign = $("notesAlign").value || "left";
+  const notesStack = (state.sections.notes && notesText) ? [{ text: "Invoice note", fontSize: 8, bold: true, color: theme.body.label, alignment: notesAlign, margin: [0, 0, 0, 3] }, { text: notesText, fontSize: 9, color: theme.body.text, alignment: notesAlign }] : [{ text: "" }];
 
   content.push({
     columns: [
@@ -467,8 +470,8 @@ async function buildInvoiceDocDefinition() {
   if ((state.sections.payment && paymentText) || (state.sections.terms && termsText)) {
     content.push({
       columns: [
-        { width: "*", stack: (state.sections.payment && paymentText) ? [{ text: "Payment details", fontSize: 8, bold: true, color: theme.body.label, margin: [0, 0, 0, 3] }, { text: paymentText, fontSize: 9, color: theme.body.text }] : [{ text: "" }] },
-        { width: "*", stack: (state.sections.terms && termsText) ? [{ text: "Terms", fontSize: 8, bold: true, color: theme.body.label, margin: [0, 0, 0, 3] }, { text: termsText, fontSize: 9, color: theme.body.text }] : [{ text: "" }] }
+        { width: "*", stack: (state.sections.payment && paymentText) ? [{ text: "Payment details", fontSize: 8, bold: true, color: theme.body.label, alignment: notesAlign, margin: [0, 0, 0, 3] }, { text: paymentText, fontSize: 9, color: theme.body.text, alignment: notesAlign }] : [{ text: "" }] },
+        { width: "*", stack: (state.sections.terms && termsText) ? [{ text: "Terms", fontSize: 8, bold: true, color: theme.body.label, alignment: notesAlign, margin: [0, 0, 0, 3] }, { text: termsText, fontSize: 9, color: theme.body.text, alignment: notesAlign }] : [{ text: "" }] }
       ],
       columnGap: 18,
       margin: [0, 6, 0, 0]

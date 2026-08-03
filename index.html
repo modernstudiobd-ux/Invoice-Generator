@@ -172,6 +172,14 @@
   <input id="logoHeight" type="range" min="24" max="160" value="48">
   <div class="hint"><span id="logoHeightValue">48</span> px — width scales automatically to fit any logo's aspect ratio</div>
 </div>
+<div class="field" style="margin-top:9px">
+  <label for="logoPosition">Logo position</label>
+  <select id="logoPosition">
+    <option value="">Auto (template default)</option>
+    <option value="left">Left of company name</option>
+    <option value="above">Above company name</option>
+  </select>
+</div>
 </div>
       </div>
     </section>
@@ -194,6 +202,14 @@
         <div class="field full"><label for="notes">Notes</label><textarea id="notes" placeholder="Optional"></textarea></div>
         <div class="field full"><label for="paymentDetails">Payment details</label><textarea id="paymentDetails"></textarea></div>
         <div class="field full"><label for="terms">Terms</label><textarea id="terms" placeholder="Optional"></textarea></div>
+        <div class="field full">
+          <label for="notesAlign">Note / payment / terms text alignment</label>
+          <select id="notesAlign">
+            <option value="left">Left</option>
+            <option value="center">Middle</option>
+            <option value="right">Right</option>
+          </select>
+        </div>
       </div>
     </section>
   </div>
@@ -263,11 +279,11 @@
       </div>
       <div class="hint" style="margin:8px 0 10px">The four settings below are optional overrides — leave the HEX field empty to keep the template's own default.</div>
       <div class="field">
-        <label for="totalColorHex">Total due color</label>
+        <label for="totalColorHex">Balance due text color</label>
         <div class="colorrow">
-          <input id="totalColor" type="color" value="#18181b" aria-label="Total due color swatch">
-          <input id="totalColorHex" type="text" placeholder="Auto (matches accent)" autocomplete="off" spellcheck="false">
-          <button class="btn small icon" id="totalColorClear" type="button" title="Clear override" aria-label="Clear total due color override">✕</button>
+          <input id="totalColor" type="color" value="#18181b" aria-label="Balance due text color swatch">
+          <input id="totalColorHex" type="text" placeholder="Auto (template default)" autocomplete="off" spellcheck="false">
+          <button class="btn small icon" id="totalColorClear" type="button" title="Clear override" aria-label="Clear balance due text color override">✕</button>
         </div>
       </div>
       <div class="field">

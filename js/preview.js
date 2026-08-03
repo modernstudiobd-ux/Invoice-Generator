@@ -8,11 +8,13 @@ import { applyAllOptionalColors } from "./accent.js";
 
 export function renderPreview() {
   let inv = $("invoice"), tpl = $("template").value;
-  inv.className = "invoice template-" + tpl;
+  const logoPos = $("logoPosition").value;
+  const notesAlign = $("notesAlign").value || "left";
+  inv.className = "invoice template-" + tpl + (logoPos ? " logo-position-" + logoPos : "") + " notes-align-" + notesAlign;
   // renderPreview() resets the invoice's className above (to swap the
-  // template class) — that wipes the has-header-bg/has-header-text toggle
-  // classes set by the optional color overrides, so re-derive them here from
-  // the current HEX fields every time a render happens.
+  // template/layout classes) — that wipes the has-header-bg/has-header-text
+  // toggle classes set by the optional color overrides, so re-derive them
+  // here from the current HEX fields every time a render happens.
   applyAllOptionalColors();
   applyPaperSize();
   const labels = { title: "INVOICE", bill: "Bill to", status: "Invoice status", balance: "Balance due", note: "Invoice note", payment: "Payment details", terms: "Terms", date: "Invoice date", due: "Due date", ref: "Reference" };
