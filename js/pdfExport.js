@@ -501,7 +501,25 @@ export async function downloadInvoicePDF(suggestedName) {
   }
 }
 
-export function printInvoice(suggestedName) {
+export async function printInvoice(suggestedName) {
+  try {
+    toast("Preparing print preview…");
+    await ensurePDFMake();
+    const docDefinition = await buildInvoiceDocDefinition();
+    // Printing the exact same pdfmake document used by Export PDF (via
+    // pdfmake's own .print(), which opens it in a hidden frame and invokes
+    // the browser's print dialog on that PDF) guarantees Print and Export
+    // PDF are always identical — same layout engine, same output.
+    pdfMake.createPdf(docDefinition).print();
+  } catch (err) {
+    toast("Couldn't prepare the PDF for printing, printing the on-screen preview instead.");
+    printInvoiceFromDOM(suggestedName);
+  }
+}
+
+// Fallback used only if the PDF library can't load (e.g. no network access):
+// prints the live on-screen invoice directly, same as before this change.
+function printInvoiceFromDOM(suggestedName) {
   const invoice = $("invoice");
   const wrap = document.querySelector(".canvaswrap");
   const oldTitle = document.title;

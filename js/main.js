@@ -78,7 +78,10 @@ $("resetLogoSizeBtn").onclick = () => { $("logoHeight").value = naturalLogoHeigh
 $("resetColorBtn").onclick = () => { setAccent(DEFAULT_ACCENT); OPTIONAL_COLOR_IDS.forEach(clearOptionalColor); renderPreview(); save(); toast("Colors reset."); };
 
 /* --- Print / PDF / JSON export-import / reset --- */
-$("printBtn").onclick = () => printInvoice();
+$("printBtn").onclick = () => {
+  const filename = ($("invoiceNumber").value || "invoice").trim().replace(/[\\/:*?"<>|]+/g, "-");
+  printInvoice(filename);
+};
 $("pdfBtn").onclick = () => {
   const filename = ($("invoiceNumber").value || "invoice").trim().replace(/[\\/:*?"<>|]+/g, "-");
   downloadInvoicePDF(filename);
