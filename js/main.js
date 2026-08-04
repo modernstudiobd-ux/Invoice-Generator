@@ -16,7 +16,7 @@ import { save, undo, redo, pushEditHistory, updateUndoRedoButtons } from "./pers
 import { load } from "./invoiceData.js";
 import { LIBRARY_KEY, CURRENT_ID_KEY, getCurrentId, setCurrentId, saveToHistory, renderHistory, duplicateCurrentInvoice, newInvoice, clearLibrary } from "./library.js";
 import { parseCSV, mapRows, ensureXLSX } from "./importSheet.js";
-import { downloadInvoicePDF, printInvoice } from "./pdfExport.js";
+import { printInvoice } from "./print.js";
 import { initInstallPrompt, registerServiceWorker } from "./install.js";
 // layout.js self-wires its own listeners on import (tabs, sidebar, mobile drawer, etc.)
 import "./layout.js";
@@ -77,18 +77,10 @@ $("removeLogoBtn").onclick = () => { state.logo = ""; state.logoNatural = null; 
 $("resetLogoSizeBtn").onclick = () => { $("logoHeight").value = naturalLogoHeight(); renderPreview(); save(); toast(state.logoNatural ? "Logo reset to its original size." : "Logo size reset to default."); };
 $("resetColorBtn").onclick = () => { setAccent(DEFAULT_ACCENT); OPTIONAL_COLOR_IDS.forEach(clearOptionalColor); renderPreview(); save(); toast("Colors reset."); };
 
-/* --- Print / PDF / JSON export-import / reset --- */
+/* --- Print / JSON export-import / reset --- */
 $("printBtn").onclick = () => {
   const filename = ($("invoiceNumber").value || "invoice").trim().replace(/[\\/:*?"<>|]+/g, "-");
-  // Opened synchronously, right in the click handler, so it carries the
-  // click's own permission — opening it later (after the PDF library has
-  // loaded) can get treated as an unrequested pop-up and silently blocked.
-  const win = window.open("", "_blank");
-  printInvoice(filename, win);
-};
-$("pdfBtn").onclick = () => {
-  const filename = ($("invoiceNumber").value || "invoice").trim().replace(/[\\/:*?"<>|]+/g, "-");
-  downloadInvoicePDF(filename);
+  printInvoice(filename);
 };
 function download(name, text) { let b = new Blob([text], { type: "application/json" }), u = URL.createObjectURL(b), a = document.createElement("a"); a.href = u; a.download = name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(u), 500); }
 $("exportBtn").onclick = () => download(($("invoiceNumber").value || "invoice") + ".json", JSON.stringify(serialize(), null, 2));
