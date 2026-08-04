@@ -80,7 +80,11 @@ $("resetColorBtn").onclick = () => { setAccent(DEFAULT_ACCENT); OPTIONAL_COLOR_I
 /* --- Print / PDF / JSON export-import / reset --- */
 $("printBtn").onclick = () => {
   const filename = ($("invoiceNumber").value || "invoice").trim().replace(/[\\/:*?"<>|]+/g, "-");
-  printInvoice(filename);
+  // Opened synchronously, right in the click handler, so it carries the
+  // click's own permission — opening it later (after the PDF library has
+  // loaded) can get treated as an unrequested pop-up and silently blocked.
+  const win = window.open("", "_blank");
+  printInvoice(filename, win);
 };
 $("pdfBtn").onclick = () => {
   const filename = ($("invoiceNumber").value || "invoice").trim().replace(/[\\/:*?"<>|]+/g, "-");

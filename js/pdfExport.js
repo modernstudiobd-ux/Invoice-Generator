@@ -501,17 +501,37 @@ export async function downloadInvoicePDF(suggestedName) {
   }
 }
 
-export async function printInvoice(suggestedName) {
+export async function printInvoice(suggestedName, preOpenedWindow) {
+  const win = preOpenedWindow || null;
   try {
-    toast("Preparing print preview…");
+    if (win && !win.closed) { win.document.write("<title>Preparing…</title><body style='font:14px -apple-system,Segoe UI,Arial,sans-serif;padding:28px;color:#475467'>Preparing your invoice for printing…</body>"); win.document.close(); }
     await ensurePDFMake();
     const docDefinition = await buildInvoiceDocDefinition();
-    // Printing the exact same pdfmake document used by Export PDF (via
-    // pdfmake's own .print(), which opens it in a hidden frame and invokes
-    // the browser's print dialog on that PDF) guarantees Print and Export
-    // PDF are always identical — same layout engine, same output.
-    pdfMake.createPdf(docDefinition).print();
+    // Print and Export PDF now build and render the exact same pdfmake
+    // document, so opening/printing it here (rather than printing the live
+    // on-screen page separately) guarantees the two are always identical.
+    pdfMake.createPdf(docDefinition).getBlob(blob => {
+      const url = URL.createObjectURL(blob);
+      if (win && !win.closed) {
+        win.location.href = url;
+        // Best-effort auto-print once the PDF has loaded in the tab. Some
+        // browsers block a print dialog triggered this way (the original
+        // click's permission can expire during the async steps above) — if
+        // that happens the tab is still showing the exact same PDF, and the
+        // person can print it themselves (Ctrl/Cmd+P) for the same result.
+        const tryPrint = () => { try { win.focus(); win.print(); } catch {} };
+        win.addEventListener("load", tryPrint, { once: true });
+        setTimeout(tryPrint, 700);
+      } else {
+        // No pre-opened tab (pop-up blocked, or called without one) — fall
+        // back to a normal download so the person still gets the exact file.
+        const a = document.createElement("a"); a.href = url; a.download = (suggestedName || "invoice") + ".pdf"; document.body.appendChild(a); a.click(); a.remove();
+        toast("Pop-ups are blocked, so the PDF downloaded instead — open it and print from there.");
+      }
+      setTimeout(() => URL.revokeObjectURL(url), 60000);
+    });
   } catch (err) {
+    if (win && !win.closed) win.close();
     toast("Couldn't prepare the PDF for printing, printing the on-screen preview instead.");
     printInvoiceFromDOM(suggestedName);
   }
