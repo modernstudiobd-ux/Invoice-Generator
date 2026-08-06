@@ -44,6 +44,40 @@ export function currentPaper() {
   return PAPER_SIZES[sel ? sel.value : "a4"] || PAPER_SIZES.a4;
 }
 
+// Each template's own .invoice padding (top/right/bottom/left, mm) — must
+// stay in sync with css/invoice.css's base .invoice rule and each
+// .invoice.template-X rule in css/templates.css. Templates not listed here
+// (currently just Corporate) don't override the base padding, so they use
+// the "modern" entry below.
+const TEMPLATE_PADDING_MM = {
+  modern: { top: 12, right: 12, bottom: 11, left: 12 },
+  classic: { top: 14, right: 14, bottom: 13, left: 14 },
+  compact: { top: 10, right: 10, bottom: 9, left: 10 },
+  apple: { top: 16, right: 16, bottom: 14, left: 16 },
+  luxury: { top: 18, right: 16, bottom: 18, left: 16 },
+  agency: { top: 16, right: 16, bottom: 14, left: 20 },
+  medical: { top: 14, right: 14, bottom: 14, left: 14 },
+  legal: { top: 16, right: 18, bottom: 16, left: 18 },
+  realestate: { top: 14, right: 14, bottom: 14, left: 14 },
+  freelancer: { top: 14, right: 14, bottom: 14, left: 14 },
+  restaurant: { top: 14, right: 14, bottom: 14, left: 14 },
+  retail: { top: 14, right: 14, bottom: 14, left: 14 },
+  technology: { top: 14, right: 14, bottom: 14, left: 14 },
+  manufacturing: { top: 12, right: 12, bottom: 12, left: 12 },
+  dark: { top: 14, right: 14, bottom: 14, left: 14 }
+};
+
+// The footer's left/right inset always matches the template's own left/right
+// padding, and its distance from the bottom edge is the template's own
+// bottom padding minus 2mm (leaving a small gap above the physical page/paper
+// edge) — the exact relationship "Modern Professional" already used
+// (padding-bottom 11mm → footer 9mm from the bottom), now applied to every
+// template instead of one hardcoded 12mm/9mm pair for all of them.
+export function templateFooterInsetMm(tpl) {
+  const p = TEMPLATE_PADDING_MM[tpl] || TEMPLATE_PADDING_MM.modern;
+  return { left: p.left, right: p.right, bottom: Math.max(0, p.bottom - 2) };
+}
+
 // Printed/PDF pages after the first get a top margin so a multi-page invoice
 // doesn't look like it just abruptly continues flush against the page edge.
 // The first page keeps margin 0 (matches the on-screen design, which already
@@ -64,12 +98,6 @@ function cssStringEscape(s) {
   return String(s ?? "").replace(/\\/g, "\\\\").replace(/"/g, '\\"').replace(/[\r\n]+/g, " ").trim();
 }
 
-// Matches .invoice's own left/right padding (see invoice.css: padding:12mm 12mm 11mm)
-// so the print footer text lines up with the invoice content above it instead
-// of sitting flush against the physical page edges — the @page margin-box
-// band spans the full page width regardless, this insets the text within it.
-const PRINT_PAGE_SIDE_MARGIN_MM = 12;
-
 export function applyPaperSize() {
   const p = currentPaper();
   document.documentElement.style.setProperty("--page-w", p.w + "mm");
@@ -79,10 +107,16 @@ export function applyPaperSize() {
   const companyName = cssStringEscape((companyNameEl && companyNameEl.value.trim()) || "Your Company");
   const invoiceNumber = cssStringEscape((invoiceNumberEl && invoiceNumberEl.value.trim()) || "Untitled");
   const footerOn = state.sections.footer;
+  // Matches this template's own .invoice padding (see TEMPLATE_PADDING_MM
+  // above) so the print footer text lines up with the invoice content above
+  // it, the same way the on-screen ".footer" element now does — instead of a
+  // single fixed inset borrowed from Modern Professional for every template.
+  const tplEl = $("template");
+  const inset = templateFooterInsetMm(tplEl ? tplEl.value : "modern");
 
   const footerBoxes = footerOn
-    ? `@bottom-left{content:"${companyName}";font-family:Inter,"Segoe UI",Arial,sans-serif;font-size:8pt;color:#8a94a5;text-align:left;padding-left:${PRINT_PAGE_SIDE_MARGIN_MM}mm}` +
-      `@bottom-right{content:"Invoice #${invoiceNumber}  ·  Page " counter(page) " of " counter(pages);font-family:Inter,"Segoe UI",Arial,sans-serif;font-size:8pt;color:#8a94a5;text-align:right;padding-right:${PRINT_PAGE_SIDE_MARGIN_MM}mm}`
+    ? `@bottom-left{content:"${companyName}";font-family:Inter,"Segoe UI",Arial,sans-serif;font-size:8pt;color:#8a94a5;text-align:left;padding-left:${inset.left}mm}` +
+      `@bottom-right{content:"Invoice #${invoiceNumber}  ·  Page " counter(page) " of " counter(pages);font-family:Inter,"Segoe UI",Arial,sans-serif;font-size:8pt;color:#8a94a5;text-align:right;padding-right:${inset.right}mm}`
     : "";
 
   $("pageSizeCSS").textContent =

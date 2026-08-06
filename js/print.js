@@ -12,21 +12,25 @@ export function printInvoice(suggestedName) {
   const oldTransform = invoice.style.transform;
   const oldMarginLeft = invoice.style.marginLeft;
   const oldWrapHeight = wrap ? wrap.style.height : "";
+  const oldWrapWidth = wrap ? wrap.style.width : "";
+  const oldWrapMaxWidth = wrap ? wrap.style.maxWidth : "";
   // document.title becomes the print dialog's/PDF's suggested filename in
   // most browsers when printing or choosing "Save as PDF" as the destination.
   if (suggestedName) document.title = suggestedName;
   // The on-screen invoice is shown at a zoomed/fit-to-panel scale (see
-  // fitInvoiceCanvas in preview.js); print.css prints it full-size, so this
-  // neutralizes that scale just for the print, then restores it afterward.
+  // fitInvoiceCanvas in preview.js) — above 100% zoom that also widens
+  // .canvaswrap itself (so the zoomed page isn't clipped on screen) — print.css
+  // prints the invoice full-size regardless, so this neutralizes all of that
+  // just for the print, then restores the real preview afterward.
   invoice.style.transform = "none";
   invoice.style.marginLeft = "0";
-  if (wrap) wrap.style.height = "auto";
+  if (wrap) { wrap.style.height = "auto"; wrap.style.width = "auto"; wrap.style.maxWidth = "none"; }
   requestAnimationFrame(() => {
     window.print();
     setTimeout(() => {
       invoice.style.transform = oldTransform;
       invoice.style.marginLeft = oldMarginLeft;
-      if (wrap) wrap.style.height = oldWrapHeight;
+      if (wrap) { wrap.style.height = oldWrapHeight; wrap.style.width = oldWrapWidth; wrap.style.maxWidth = oldWrapMaxWidth; }
       document.title = oldTitle;
     }, 250);
   });

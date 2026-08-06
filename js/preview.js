@@ -1,7 +1,7 @@
 // preview.js — renders the live invoice document (the on-screen A4/Letter canvas).
 
 import { $, esc } from "./dom.js";
-import { state, currentPaper, applyPaperSize } from "./state.js";
+import { state, currentPaper, applyPaperSize, templateFooterInsetMm } from "./state.js";
 import { money, dateFmt, alignClass, fmtCell, num } from "./format.js";
 import { calc, itemValue } from "./calc.js";
 import { applyAllOptionalColors } from "./accent.js";
@@ -16,6 +16,13 @@ export function renderPreview() {
   // toggle classes set by the optional color overrides, so re-derive them
   // here from the current HEX fields every time a render happens.
   applyAllOptionalColors();
+  // Footer inset matches this template's own padding (see TEMPLATE_PADDING_MM
+  // in state.js) — the same values the print footer uses — instead of a
+  // fixed 12mm/9mm inset borrowed from Modern Professional for every template.
+  const footerInset = templateFooterInsetMm(tpl);
+  inv.style.setProperty("--footer-left", footerInset.left + "mm");
+  inv.style.setProperty("--footer-right", footerInset.right + "mm");
+  inv.style.setProperty("--footer-bottom", footerInset.bottom + "mm");
   applyPaperSize();
   const labels = { title: "INVOICE", bill: "Bill to", status: "Invoice status", balance: "Balance due", note: "Invoice note", payment: "Payment details", terms: "Terms", date: "Invoice date", due: "Due date", ref: "Reference" };
   $("pInvoiceTitle").textContent = labels.title;
@@ -71,16 +78,32 @@ export function fitInvoiceCanvas() {
   const p = currentPaper();
   const naturalW = p.w * 96 / 25.4;   // page width in CSS px at the standard 96dpi
   const naturalH = p.h * 96 / 25.4;   // page height in CSS px
-  const available = wrap.clientWidth || naturalW;
+  // Measure against the wrap's own parent, not wrap.clientWidth itself — the
+  // wrap's CSS max-width caps it at one natural page width, so at zoom>100%
+  // clientWidth would silently cap "available" too, making the scaled
+  // invoice wider than its own wrapper. That's what caused zooming in to
+  // clip/shift the preview instead of actually showing it larger.
+  const panel = wrap.parentElement;
+  const available = (panel ? panel.clientWidth : 0) || naturalW;
   const fit = Math.min(1, available / naturalW);   // shrink to fit narrow screens; never auto-enlarge
   const total = fit * state.zoom;
   const scaledW = naturalW * total;
   inv.style.transformOrigin = "top left";
   inv.style.transform = `scale(${total})`;
-  inv.style.marginLeft = ((available - scaledW) / 2) + "px";   // center explicitly — CSS auto-margins can't
-                                                                 // center a box wider than its container (it just
-                                                                 // left-aligns instead), which is exactly what
-                                                                 // happened on phones before this fix
+  wrap.style.maxWidth = "none";   // let the wrapper grow past one page width when zoomed in past 100%
+  if (scaledW <= available) {
+    // Fits within the panel (includes the shrink-to-fit case on narrow
+    // screens): size the wrap to the panel and center the invoice inside it.
+    wrap.style.width = available + "px";
+    inv.style.marginLeft = ((available - scaledW) / 2) + "px";
+  } else {
+    // Zoomed in past what the panel can show at once: grow the wrap to
+    // match the real (larger) size instead of clipping it — .workspace
+    // already scrolls, so this reveals the rest via scrolling, the same way
+    // a multi-page invoice already scrolls vertically below.
+    wrap.style.width = scaledW + "px";
+    inv.style.marginLeft = "0";
+  }
 
   // Multi-page invoices: the invoice box naturally grows taller than one page
   // when content overflows (it uses min-height, not a fixed height), but the

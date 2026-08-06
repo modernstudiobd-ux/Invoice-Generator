@@ -57,7 +57,7 @@
     </div>
   </div>
   <div class="actions">
-    <button class="btn primary" id="printBtn">Print</button>
+    <button class="btn primary" id="printBtn">Print / PDF</button>
     <button class="btn icon" id="undoBtn" title="Undo (Ctrl+Z)" aria-label="Undo last change" disabled>↶</button>
     <button class="btn icon" id="redoBtn" title="Redo (Ctrl+Shift+Z)" aria-label="Redo last change" disabled>↷</button>
     <button class="btn icon actions-more-toggle" id="actionsMoreBtn" aria-haspopup="true" aria-expanded="false" aria-controls="actionsMorePanel" title="More actions">⋯</button>
@@ -339,8 +339,8 @@
      <button class="btn small" id="newInvoiceBtn" title="Clear client and items; keeps company profile and design">+ New invoice</button>
    </div>
  </div>
+ <div class="canvasbar"><div class="meta" id="previewMeta">A4 portrait preview</div><div class="actions"><button class="btn small" id="zoomOut">−</button><span class="meta" id="zoomLabel">100%</span><button class="btn small" id="zoomIn">+</button></div></div>
  <div class="canvaswrap">
-  <div class="canvasbar"><div class="meta" id="previewMeta">A4 portrait preview</div><div class="actions"><button class="btn small" id="zoomOut">−</button><span class="meta" id="zoomLabel">100%</span><button class="btn small" id="zoomIn">+</button></div></div>
   <article class="invoice template-modern" id="invoice">
     <header class="inv-header">
       <div class="companywrap" data-section="company">
