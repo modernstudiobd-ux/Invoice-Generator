@@ -56,51 +56,53 @@
 .template-apple .notebox{background:#f5f5f7;border:0;border-radius:14px}
 .template-apple .footer{color:#86868b}
 
-/* Corporate — full-bleed navy header banner, bold uppercase type, square
-   edges: the buttoned-up look of a formal B2B letterhead. */
+/* Corporate — crisp navy-on-white letterhead: bold uppercase type and a
+   strong header rule instead of a filled banner, so it stays print-friendly
+   (no heavy full-bleed ink fill) while keeping a buttoned-up B2B feel. */
 .invoice.template-corporate{font-family:Arial,Helvetica,sans-serif}
-.template-corporate .inv-header{background:var(--header-bg,#0b2545);margin:-12mm -12mm 16px;padding:12mm 12mm 16px;border-bottom:3px solid var(--template-accent)}
-.template-corporate .companyname{color:#fff;font-size:17px;text-transform:uppercase;letter-spacing:.05em;font-weight:800}
-.template-corporate .metaText{color:#a9b7d1}
-.template-corporate .logobox:not(.has-logo){background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.25)}
-.template-corporate .invtitle h2{color:#fff;font-weight:800;font-size:26px;letter-spacing:.08em}
-.template-corporate .invno{color:#a9b7d1;font-weight:700}
-.template-corporate .metatable td:first-child{color:#a9b7d1}
-.template-corporate .metatable td:last-child{color:#fff}
-.template-corporate .balance{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.3);border-radius:4px}
-.template-corporate .balance strong{color:var(--total-color,#fff)}
+.template-corporate .inv-header{border-bottom:3px solid var(--template-accent);padding-bottom:14px}
+.template-corporate .companyname{color:#0b2545;font-size:17px;text-transform:uppercase;letter-spacing:.05em;font-weight:800}
+.template-corporate .metaText{color:#5b6b84}
+.template-corporate .logobox:not(.has-logo){background:#eef2f7;border:1px solid #c7d2e0}
+.template-corporate .invtitle h2{color:#0b2545;font-weight:800;font-size:26px;letter-spacing:.08em}
+.template-corporate .invno{color:#5b6b84;font-weight:700}
+.template-corporate .metatable td:first-child{color:#5b6b84}
+.template-corporate .metatable td:last-child{color:#0b2545}
+.template-corporate .balance{background:#eef2f7;border:1px solid #c7d2e0;border-radius:4px}
+.template-corporate .balance strong{color:var(--total-color,#0b2545)}
 .template-corporate .status{border-radius:3px}
 .template-corporate .billrow{margin:16px 0}
 .template-corporate .label{color:#0b2545;font-weight:800}
-.template-corporate .invtable th{background:#0b2545;color:#fff;border-color:#0b2545;font-weight:800;letter-spacing:.04em}
+.template-corporate .invtable th{background:#eef2f7;color:#0b2545;border-color:#c7d2e0;font-weight:800;letter-spacing:.04em}
 .template-corporate .invtable td{border-color:#d7dde6}
 .template-corporate .summary{border-top:2px solid #0b2545}
 .template-corporate .sumrow.total{border-top:1px solid #0b2545}
 
-/* Luxury — black canvas, gold rule work, wide-tracked serif caps: a
-   boutique atelier invoice rather than an accounting document. */
-.invoice.template-luxury{font-family:Georgia,"Times New Roman",serif;background:var(--invoice-bg,#0c0c0c);color:#f3ede2;padding:18mm 16mm}
-.template-luxury .companyname{color:#f3ede2;text-transform:uppercase;letter-spacing:.14em;font-size:15px;font-weight:400}
-.template-luxury .metaText{color:#b8ab8f}
+/* Luxury — ivory canvas, gold rule work, wide-tracked serif caps: a
+   boutique atelier invoice, kept print-friendly (no heavy ink fills) while
+   staying elegant via typography and thin gold rules rather than color. */
+.invoice.template-luxury{font-family:Georgia,"Times New Roman",serif;background:var(--invoice-bg,#ffffff);color:#2a231c;padding:18mm 16mm}
+.template-luxury .companyname{color:#2a231c;text-transform:uppercase;letter-spacing:.14em;font-size:15px;font-weight:400}
+.template-luxury .metaText{color:#8a7c62}
 .template-luxury .logobox:not(.has-logo){background:transparent;border:1px solid #b08d57}
-.template-luxury .logofallback{background:#b08d57;color:#0c0c0c}
+.template-luxury .logofallback{background:#b08d57;color:#fff}
 .template-luxury .invtitle h2{color:#b08d57;font-weight:400;letter-spacing:.22em;font-size:26px}
-.template-luxury .invno{color:#b8ab8f;letter-spacing:.05em}
+.template-luxury .invno{color:#8a7c62;letter-spacing:.05em}
 .template-luxury .metatable td:first-child{color:#8a7c62}
-.template-luxury .metatable td:last-child{color:#f3ede2}
+.template-luxury .metatable td:last-child{color:#2a231c}
 .template-luxury .inv-header{border-bottom:1px solid #b08d57;padding-bottom:14px}
 .template-luxury .balance{background:transparent;border:1px solid #b08d57;border-radius:0}
 .template-luxury .balance strong{color:var(--total-color,#b08d57)}
 .template-luxury .status{border-radius:0}
 .template-luxury .label{color:#8a7c62;letter-spacing:.14em}
-.template-luxury .clientname{color:#f3ede2}
-.template-luxury .invtable th{background:transparent;border:0;border-top:1px solid #b08d57;border-bottom:1px solid #b08d57;color:#b08d57;letter-spacing:.08em;font-weight:400}
-.template-luxury .invtable td{border:0;border-bottom:1px solid #2a2a2a;color:#e7e0d3}
+.template-luxury .clientname{color:#2a231c}
+.template-luxury .invtable th{background:transparent;border:0;border-top:1px solid #b08d57;border-bottom:1px solid #b08d57;color:#8a6d47;letter-spacing:.08em;font-weight:400}
+.template-luxury .invtable td{border:0;border-bottom:1px solid #e4dcc8;color:#3a3226}
 .template-luxury .empty{color:#8a7c62}
 .template-luxury .summary{border-top:1px solid #b08d57}
 .template-luxury .sumrow span:first-child{color:#8a7c62}
-.template-luxury .sumrow.total{border-top:1px solid #2a2a2a;color:#f3ede2}
-.template-luxury .notebox{background:transparent;border:1px solid #2a2a2a}
+.template-luxury .sumrow.total{border-top:1px solid #e4dcc8;color:#2a231c}
+.template-luxury .notebox{background:#faf7f0;border:1px solid #e4dcc8}
 .template-luxury .footer{color:#8a7c62}
 
 /* Creative Agency — a bold accent spine down the left margin, oversized

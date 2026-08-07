@@ -29,6 +29,38 @@ const OPTIONAL_COLOR_VARS = {
   invoiceColor: { cssVar: "--invoice-bg", hostClass: null }
 };
 
+// Each template's own actual default for these four settings — must stay in
+// sync with the CSS fallbacks in css/invoice.css and css/templates.css
+// (search for var(--total-color, / var(--header-bg, / var(--invoice-bg,).
+// Used only to make the *swatches* below show a template's real current
+// color (Luxury's gold, Medical's teal, Corporate's navy, Dark's near-black
+// canvas, etc.) whenever no override is set, instead of an arbitrary
+// leftover value — so switching templates makes it obvious what a template's
+// distinct palette actually is, and the picker starts from the right color
+// if the person wants to adjust it. Not used for "Header text" (composed of
+// several differently-colored elements) beyond the company name's own color,
+// the most prominent header text element.
+const TEMPLATE_DEFAULT_COLORS = {
+  modern: { total: "#18181b", headerBg: "#ffffff", headerText: "#1f2937", invoiceBg: "#ffffff" },
+  classic: { total: "#1f2937", headerBg: "#ffffff", headerText: "#1f2937", invoiceBg: "#ffffff" },
+  compact: { total: "#18181b", headerBg: "#ffffff", headerText: "#1f2937", invoiceBg: "#ffffff" },
+  apple: { total: "#18181b", headerBg: "#ffffff", headerText: "#1d1d1f", invoiceBg: "#ffffff" },
+  corporate: { total: "#0b2545", headerBg: "#ffffff", headerText: "#0b2545", invoiceBg: "#ffffff" },
+  luxury: { total: "#b08d57", headerBg: "#ffffff", headerText: "#2a231c", invoiceBg: "#ffffff" },
+  agency: { total: "#ffffff", headerBg: "#ffffff", headerText: "#1f2937", invoiceBg: "#ffffff" },
+  construction: { total: "#f2b705", headerBg: "#ffffff", headerText: "#1f2430", invoiceBg: "#ffffff" },
+  medical: { total: "#0f6a63", headerBg: "#f4fbfa", headerText: "#0f6a63", invoiceBg: "#ffffff" },
+  legal: { total: "#1f2937", headerBg: "#ffffff", headerText: "#1f2937", invoiceBg: "#ffffff" },
+  realestate: { total: "#2b2b28", headerBg: "#ffffff", headerText: "#2b2b28", invoiceBg: "#ffffff" },
+  freelancer: { total: "#18181b", headerBg: "#ffffff", headerText: "#1f2937", invoiceBg: "#ffffff" },
+  restaurant: { total: "#4b5320", headerBg: "#ffffff", headerText: "#3c3a2f", invoiceBg: "#fbf9f4" },
+  retail: { total: "#ffffff", headerBg: "#ffffff", headerText: "#1f2937", invoiceBg: "#ffffff" },
+  technology: { total: "#7ee7c7", headerBg: "#ffffff", headerText: "#1f2937", invoiceBg: "#ffffff" },
+  manufacturing: { total: "#1f2733", headerBg: "#ffffff", headerText: "#1f2733", invoiceBg: "#ffffff" },
+  dark: { total: "#ffffff", headerBg: "#ffffff", headerText: "#ffffff", invoiceBg: "#111318" }
+};
+const OPTIONAL_COLOR_DEFAULT_KEY = { totalColor: "total", headerColor: "headerBg", headerTextColor: "headerText", invoiceColor: "invoiceBg" };
+
 export function applyOptionalColor(id) {
   const cfg = OPTIONAL_COLOR_VARS[id];
   if (!cfg) return;
@@ -41,6 +73,13 @@ export function applyOptionalColor(id) {
   } else {
     invoice.style.removeProperty(cfg.cssVar);
     if (cfg.hostClass) invoice.classList.remove(cfg.hostClass);
+    // No override: show this template's own actual color in the swatch
+    // (see TEMPLATE_DEFAULT_COLORS above) instead of leaving whatever the
+    // previous template happened to show.
+    const tplEl = $("template");
+    const defaults = TEMPLATE_DEFAULT_COLORS[tplEl ? tplEl.value : "modern"] || TEMPLATE_DEFAULT_COLORS.modern;
+    const key = OPTIONAL_COLOR_DEFAULT_KEY[id];
+    if (key && defaults[key]) $(id).value = defaults[key];
   }
 }
 
