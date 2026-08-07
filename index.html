@@ -38,7 +38,8 @@
   <div class="drawer-head"><strong>Sections</strong><button class="btn small icon mtb-icon" id="drawerCloseBtn" aria-label="Close menu">✕</button></div>
   <button class="drawer-item active" data-tab="design" type="button">🎨&nbsp; Design</button>
   <button class="drawer-item" data-tab="details" type="button">📄&nbsp; Details</button>
-  <button class="drawer-item" data-tab="items" type="button">📋&nbsp; Items</button>
+  <button class="drawer-item" data-tab="items" type="button">📋&nbsp; Table Columns</button>
+  <button class="drawer-item" data-tab="lineitems" type="button">🧾&nbsp; Items</button>
   <div class="drawer-divider"></div>
   <div class="drawer-section-label">Invoice actions</div>
   <div class="drawer-toolbar-slot" id="invoiceToolbarSlot"></div>
@@ -73,7 +74,8 @@
   <nav class="tabs" role="tablist" aria-label="Invoice sections">
     <button class="tab active" role="tab" id="tabbtn-design" data-tab="design" aria-selected="true" aria-controls="tab-design">Design</button>
     <button class="tab" role="tab" id="tabbtn-details" data-tab="details" aria-selected="false" aria-controls="tab-details" tabindex="-1">Details</button>
-    <button class="tab" role="tab" id="tabbtn-items" data-tab="items" aria-selected="false" aria-controls="tab-items" tabindex="-1">Items</button>
+    <button class="tab" role="tab" id="tabbtn-items" data-tab="items" aria-selected="false" aria-controls="tab-items" tabindex="-1">Table Columns</button>
+    <button class="tab" role="tab" id="tabbtn-lineitems" data-tab="lineitems" aria-selected="false" aria-controls="tab-lineitems" tabindex="-1">Items</button>
   </nav>
 
   <div class="tabpane" id="tab-details" role="tabpanel" aria-labelledby="tabbtn-details">
@@ -220,6 +222,9 @@
       <div id="columnEditor"></div>
       <button class="btn small" id="restoreColumnsBtn">Restore default columns</button>
     </section>
+  </div>
+
+  <div class="tabpane" id="tab-lineitems" role="tabpanel" aria-labelledby="tabbtn-lineitems">
     <section class="panel">
       <div class="panelhead"><h2>Line items</h2><button class="btn small" id="addItemBtn">+ Add item</button></div>
       <div class="importbox">
@@ -228,6 +233,21 @@
         <input id="sheetFile" class="hidden" type="file" accept=".csv,.xlsx,.xls">
       </div>
       <p class="hint">Spreadsheet columns are matched against your current column names and common aliases.</p>
+      <details class="importhelp">
+        <summary>How to set up your CSV / Excel file ▸</summary>
+        <div class="importhelp-body">
+          <p>Put one line item per row, with a header row on top naming each column. The importer matches your headers against your current <a href="#" data-goto-tab="items">table columns</a> (Details tab) by name — plus these common aliases, so close variations still match automatically:</p>
+          <ul>
+            <li><strong>SKU</strong> — also matches: Item code, Product code, Code</li>
+            <li><strong>Description</strong> — also matches: Name, Item, Product, Course name</li>
+            <li><strong>Quantity</strong> — also matches: Qty, Net qty, Net quantity</li>
+            <li><strong>Rate</strong> — also matches: Unit price, Price, Unit rate</li>
+            <li><strong>Amount</strong> — also matches: Total, Line total</li>
+          </ul>
+          <p>Column order in the file doesn't matter — only the header names do. If a row has an Amount but no Rate, the rate is calculated for you (Amount ÷ Quantity). Missing Quantity defaults to 1. Any extra columns in the file that don't match are simply ignored.</p>
+          <p class="hint" style="margin:6px 0 0">Accepted formats: .csv, .xlsx, .xls</p>
+        </div>
+      </details>
       <div id="itemsEditor"></div>
     </section>
   </div>

@@ -79,6 +79,16 @@ tabButtons.forEach((b, i) => {
   });
 });
 
+// In-text links that jump to another tab (e.g. "table columns" inside the
+// CSV/Excel import help panel, pointing back to the Table Columns tab).
+document.addEventListener("click", e => {
+  const link = e.target.closest("[data-goto-tab]");
+  if (!link) return;
+  e.preventDefault();
+  const tabBtn = $("tabbtn-" + link.dataset.gotoTab);
+  if (tabBtn) activateTab(tabBtn, true);
+});
+
 /* --- Mobile chrome (additive UI-only wiring; no business logic here) --- */
 
 // Hamburger drawer: switches Details/Items/Design via the existing activateTab().
