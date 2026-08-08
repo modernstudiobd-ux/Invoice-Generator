@@ -21,13 +21,17 @@ export const sectionDefs = [
   ["terms", "Terms"], ["footer", "Footer"]
 ];
 
+// Every section defaults to shown except Invoice status, which most invoices
+// don't need and is off until someone turns it on.
+export const defaultSections = () => Object.fromEntries(sectionDefs.map(x => [x[0], x[0] !== "status"]));
+
 export const state = {
   logo: "",
   logoNatural: null,
   zoom: 1,
   columns: defaultColumns(),
   items: [],
-  sections: Object.fromEntries(sectionDefs.map(x => [x[0], true]))
+  sections: defaultSections()
 };
 
 export const fields = ["logoHeight", "logoPosition", "invoiceNumber", "status", "invoiceDate", "dueDate", "currency", "reference", "companyName", "companyReg", "companyVat", "companyAddress", "companyPhone", "companyEmail", "companyWebsite", "clientName", "clientContact", "clientTax", "clientAddress", "clientEmail", "discount", "tax", "shipping", "notes", "paymentDetails", "terms", "notesAlign", "template", "accent", "accentHex", "totalColorHex", "headerColorHex", "headerTextColorHex", "invoiceColorHex", "paperSize"];
@@ -114,11 +118,27 @@ export function applyPaperSize() {
   const tplEl = $("template");
   const inset = templateFooterInsetMm(tplEl ? tplEl.value : "modern");
 
+  // Total page count, computed the same way as the on-screen page-break
+  // guides (see fitInvoiceCanvas in preview.js): real content height ÷ one
+  // page's height at 96dpi. This is baked in as a literal number below
+  // rather than using CSS's counter(pages) — Firefox has never implemented
+  // that specific counter (it only supports counter(page), the *current*
+  // page number), which was silently breaking/blanking the "of N" part of
+  // the printed footer there.
+  const inv = $("invoice");
+  const naturalH = p.h * 96 / 25.4;
+  const contentH = (inv && inv.scrollHeight) || naturalH;
+  const pageCount = Math.max(1, Math.ceil(contentH / naturalH - 0.01));
+
   const footerBoxes = footerOn
     ? `@bottom-left{content:"${companyName}";font-family:Inter,"Segoe UI",Arial,sans-serif;font-size:8pt;color:#8a94a5;text-align:left;padding-left:${inset.left}mm}` +
-      `@bottom-right{content:"Invoice #${invoiceNumber}  ·  Page " counter(page) " of " counter(pages);font-family:Inter,"Segoe UI",Arial,sans-serif;font-size:8pt;color:#8a94a5;text-align:right;padding-right:${inset.right}mm}`
+      `@bottom-right{content:"Invoice #${invoiceNumber}  ·  Page " counter(page) " of ${pageCount}";font-family:Inter,"Segoe UI",Arial,sans-serif;font-size:8pt;color:#8a94a5;text-align:right;padding-right:${inset.right}mm}`
     : "";
 
+  // This is the single source of truth for @page — print.css intentionally
+  // has no @page rule of its own, to avoid two separate @page declarations
+  // (which Firefox's paged-media engine handles less predictably than
+  // Chrome's) ever disagreeing with each other.
   $("pageSizeCSS").textContent =
     `@page{size:${p.page};margin:0;margin-top:${PRINT_PAGE_TOP_MARGIN_MM}mm;margin-bottom:${PRINT_PAGE_BOTTOM_MARGIN_MM}mm;${footerBoxes}}` +
     `@page:first{margin-top:0}`;

@@ -4,6 +4,7 @@
 // way pressing Ctrl/Cmd+P on any web page would.
 
 import { $ } from "./dom.js";
+import { applyPaperSize } from "./state.js";
 
 export function printInvoice(suggestedName) {
   const invoice = $("invoice");
@@ -25,6 +26,7 @@ export function printInvoice(suggestedName) {
   invoice.style.transform = "none";
   invoice.style.marginLeft = "0";
   if (wrap) { wrap.style.height = "auto"; wrap.style.width = "auto"; wrap.style.maxWidth = "none"; }
+  applyPaperSize();   // refreshes the @page footer's page count right before printing
   requestAnimationFrame(() => {
     window.print();
     setTimeout(() => {

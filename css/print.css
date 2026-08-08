@@ -1,6 +1,10 @@
-/* Print & PDF-preview output rules */
-@page{size:A4;margin:0;margin-top:14mm;margin-bottom:12mm}
-@page :first{margin-top:0}
+/* Print & PDF-preview output rules.
+   @page itself is intentionally NOT declared here — it's generated
+   dynamically by applyPaperSize() in state.js (paper size, margins, and the
+   footer's @bottom-left/@bottom-right content) and injected into the
+   #pageSizeCSS <style> tag. Keeping that as the single @page source avoids
+   two separate @page declarations ever disagreeing, which Firefox's paged
+   media engine handles less predictably than Chrome's. */
 @media print{
   html,body{background:#fff}
   .sidebar,.sidebar-resizer,.canvasbar{display:none!important}
