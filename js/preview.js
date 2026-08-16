@@ -85,6 +85,30 @@ export function renderPreview() {
 let printGuard = false;
 export function setPrintGuard(v) { printGuard = v; }
 
+// Stretches .invoice to an exact multiple of one physical page's height, so
+// its own background (whatever color the current template uses — cream,
+// dark, white, whatever) is what fills every printed page fully, right to
+// the physical edge, instead of leaving a plain-white gap wherever the real
+// content happens to end. @page margins are 0 (see applyPaperSize in
+// state.js), so there's no separate per-page margin math to account for —
+// one page is simply one --page-h tall, uniformly, first page included.
+// Called right before print/PDF export; undone by clearPrintPageHeight()
+// once it's done. Purely a print-time layout concern — the on-screen
+// preview's own page-break guides (renderPageBreaks, below) are unaffected.
+export function applyPrintPageHeight() {
+  const inv = $("invoice");
+  if (!inv) return;
+  const p = currentPaper();
+  const naturalH = p.h * 96 / 25.4;   // one page's height in CSS px, matching fitInvoiceCanvas
+  const pageCount = Math.max(1, Math.ceil(inv.scrollHeight / naturalH - 0.01));
+  inv.style.minHeight = (pageCount * p.h) + "mm";
+}
+
+export function clearPrintPageHeight() {
+  const inv = $("invoice");
+  if (inv) inv.style.minHeight = "";
+}
+
 export function fitInvoiceCanvas() {
   if (printGuard) return;
   const wrap = document.querySelector(".canvaswrap"), inv = $("invoice");

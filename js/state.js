@@ -84,21 +84,18 @@ export function templateFooterInsetMm(tpl) {
   return { left: p.left, right: p.right, bottom: Math.max(0, p.bottom - 2) };
 }
 
-// Printed/PDF pages after the first get a top margin so a multi-page invoice
-// doesn't look like it just abruptly continues flush against the page edge.
-// The first page keeps margin 0 (matches the on-screen design, which already
-// accounts for its own internal spacing).
-export const PRINT_PAGE_TOP_MARGIN_MM = 14;
-
-// Reserved space at the bottom of every printed page for the footer. The
-// footer itself is the real ".footer" DOM element (already used for the
-// on-screen preview), switched to position:fixed for print so it repeats on
-// every page — see print.css. It used to be rendered via native CSS @page
-// margin boxes (@bottom-left/@bottom-right) instead, but Firefox has
-// essentially no support for margin-box content, which was silently
-// dropping the entire footer there.
-const PRINT_PAGE_BOTTOM_MARGIN_MM = 12;
-
+// @page margin is intentionally 0 on every page, top and bottom — a *real*
+// CSS @page margin band is never painted by the document's own background
+// (html/body/.invoice backgrounds simply don't reach into it, in every
+// browser tested), so any margin declared here would show up as a hard-white
+// gap no matter what color the current template is. That's exactly what
+// used to create the blank strip at the top of continuation pages and the
+// blank strip reserved at the bottom of every page. Visual separation
+// between pages instead comes from the physical/PDF page boundary itself
+// (see applyPrintPageHeight in preview.js, which stretches .invoice to an
+// exact multiple of the page height so its background — whatever color the
+// current template uses — fills every page, including the leftover space
+// past the end of the content on the last page).
 function cssStringEscape(s) {
   return String(s ?? "").replace(/\\/g, "\\\\").replace(/"/g, '\\"').replace(/[\r\n]+/g, " ").trim();
 }
@@ -111,9 +108,7 @@ export function applyPaperSize() {
   // has no @page rule of its own, to avoid two separate @page declarations
   // (which Firefox's paged-media engine handles less predictably than
   // Chrome's) ever disagreeing with each other.
-  $("pageSizeCSS").textContent =
-    `@page{size:${p.page};margin:0;margin-top:${PRINT_PAGE_TOP_MARGIN_MM}mm;margin-bottom:${PRINT_PAGE_BOTTOM_MARGIN_MM}mm}` +
-    `@page:first{margin-top:0}`;
+  $("pageSizeCSS").textContent = `@page{size:${p.page};margin:0}`;
 }
 
 // Snapshot everything needed to fully reconstruct the current invoice

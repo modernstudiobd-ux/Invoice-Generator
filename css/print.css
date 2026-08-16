@@ -1,8 +1,17 @@
 /* Print & PDF-preview output rules.
    @page itself is intentionally NOT declared here — it's generated
-   dynamically by applyPaperSize() in state.js (paper size + margins only)
-   and injected into the #pageSizeCSS <style> tag, so there's a single
-   source of truth for it.
+   dynamically by applyPaperSize() in state.js (paper size only, margin
+   always 0 — see the comment above applyPaperSize for why nothing here ever
+   declares a nonzero @page margin) and injected into the #pageSizeCSS
+   <style> tag, so there's a single source of truth for it.
+
+   Page-to-page spacing/background: with @page margin at 0, .invoice is
+   stretched at print time (applyPrintPageHeight in preview.js) to an exact
+   multiple of one page's height, so its own background fills every printed
+   page fully — including whatever's left over past the end of the real
+   content on the last page — instead of leaving a plain-white gap. A real
+   @page margin can't be painted by any element's background in any browser
+   tested, which is what used to cause that gap.
 
    The footer is switched to a normal in-flow block (position:static) for
    print — deliberately NOT position:fixed, NOT position:absolute, and NOT

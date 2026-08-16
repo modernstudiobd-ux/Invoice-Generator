@@ -5,7 +5,7 @@
 
 import { $ } from "./dom.js";
 import { applyPaperSize } from "./state.js";
-import { setPrintGuard, fitInvoiceCanvas } from "./preview.js";
+import { setPrintGuard, fitInvoiceCanvas, applyPrintPageHeight, clearPrintPageHeight } from "./preview.js";
 
 export function printInvoice(suggestedName) {
   const invoice = $("invoice");
@@ -34,6 +34,11 @@ export function printInvoice(suggestedName) {
   invoice.style.marginLeft = "0";
   if (wrap) { wrap.style.height = "auto"; wrap.style.width = "auto"; wrap.style.maxWidth = "none"; }
   applyPaperSize();   // refreshes the @page footer's page count right before printing
+  // Must run after the transform/wrap reset above (needs the invoice at its
+  // real, unscaled height to measure correctly) and after applyPaperSize()
+  // (needs the current paper's real height) — see applyPrintPageHeight in
+  // preview.js for why this exists.
+  applyPrintPageHeight();
 
   let restored = false;
   const restore = () => {
@@ -44,6 +49,7 @@ export function printInvoice(suggestedName) {
     invoice.style.marginLeft = oldMarginLeft;
     if (wrap) { wrap.style.height = oldWrapHeight; wrap.style.width = oldWrapWidth; wrap.style.maxWidth = oldWrapMaxWidth; }
     document.title = oldTitle;
+    clearPrintPageHeight();
     setPrintGuard(false);
     fitInvoiceCanvas();   // re-fit the real on-screen preview now that the guard is off
   };
