@@ -72,7 +72,21 @@ export function renderPreview() {
   fitInvoiceCanvas();
 }
 
+// Print (see print.js) temporarily resizes .canvaswrap to its natural,
+// unscaled size right before calling window.print(). That resize is itself
+// observed by the ResizeObserver in main.js, which calls fitInvoiceCanvas()
+// again — and without this guard, that re-entrant call would immediately
+// re-apply the on-screen "shrink to fit the panel" transform, scaling the
+// invoice back down right as the print dialog opens. The physical page
+// still prints at full size, so the result is a full-size blank page with
+// the shrunk invoice floating in the top-left corner. print.js sets this
+// flag for the duration of the print flow so fitInvoiceCanvas() becomes a
+// no-op until it's done.
+let printGuard = false;
+export function setPrintGuard(v) { printGuard = v; }
+
 export function fitInvoiceCanvas() {
+  if (printGuard) return;
   const wrap = document.querySelector(".canvaswrap"), inv = $("invoice");
   if (!wrap || !inv) return;
   const p = currentPaper();

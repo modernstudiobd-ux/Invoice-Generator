@@ -5,6 +5,7 @@
 
 import { $ } from "./dom.js";
 import { applyPaperSize } from "./state.js";
+import { setPrintGuard, fitInvoiceCanvas } from "./preview.js";
 
 export function printInvoice(suggestedName) {
   const invoice = $("invoice");
@@ -18,6 +19,12 @@ export function printInvoice(suggestedName) {
   // document.title becomes the print dialog's/PDF's suggested filename in
   // most browsers when printing or choosing "Save as PDF" as the destination.
   if (suggestedName) document.title = suggestedName;
+  // Stop fitInvoiceCanvas() from reacting to the .canvaswrap resize below —
+  // see the comment on setPrintGuard/fitInvoiceCanvas in preview.js. Without
+  // this, the ResizeObserver in main.js re-applies the on-screen "shrink to
+  // fit panel" transform right as the print dialog opens, so the printed
+  // page comes out full-size but with the invoice shrunk into a corner.
+  setPrintGuard(true);
   // The on-screen invoice is shown at a zoomed/fit-to-panel scale (see
   // fitInvoiceCanvas in preview.js) — above 100% zoom that also widens
   // .canvaswrap itself (so the zoomed page isn't clipped on screen) — print.css
@@ -27,6 +34,27 @@ export function printInvoice(suggestedName) {
   invoice.style.marginLeft = "0";
   if (wrap) { wrap.style.height = "auto"; wrap.style.width = "auto"; wrap.style.maxWidth = "none"; }
   applyPaperSize();   // refreshes the @page footer's page count right before printing
+
+  let restored = false;
+  const restore = () => {
+    if (restored) return;
+    restored = true;
+    window.removeEventListener("afterprint", restore);
+    invoice.style.transform = oldTransform;
+    invoice.style.marginLeft = oldMarginLeft;
+    if (wrap) { wrap.style.height = oldWrapHeight; wrap.style.width = oldWrapWidth; wrap.style.maxWidth = oldWrapMaxWidth; }
+    document.title = oldTitle;
+    setPrintGuard(false);
+    fitInvoiceCanvas();   // re-fit the real on-screen preview now that the guard is off
+  };
+  // afterprint fires once the print dialog actually closes — in every
+  // browser that supports it, that's a more reliable restore trigger than a
+  // fixed timeout (which either fires too early, while the dialog is still
+  // up, or leaves the reset styles sitting around too long if the user takes
+  // a while in the dialog). The setTimeout below is just a fallback for the
+  // rare case afterprint never fires.
+  window.addEventListener("afterprint", restore);
+
   // Two animation frames + a short delay gives the browser time to fully
   // reflow with the reset styles above and the print stylesheet before the
   // dialog opens — one frame is enough in Chrome, but Firefox can otherwise
@@ -35,12 +63,7 @@ export function printInvoice(suggestedName) {
   requestAnimationFrame(() => requestAnimationFrame(() => {
     setTimeout(() => {
       window.print();
-      setTimeout(() => {
-        invoice.style.transform = oldTransform;
-        invoice.style.marginLeft = oldMarginLeft;
-        if (wrap) { wrap.style.height = oldWrapHeight; wrap.style.width = oldWrapWidth; wrap.style.maxWidth = oldWrapMaxWidth; }
-        document.title = oldTitle;
-      }, 250);
+      setTimeout(restore, 1000);
     }, 60);
   }));
 }
