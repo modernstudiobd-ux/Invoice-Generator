@@ -71,31 +71,53 @@ const TEMPLATE_PADDING_MM = {
   dark: { top: 14, right: 14, bottom: 14, left: 14 }
 };
 
-// The footer's left/right inset always matches the template's own left/right
-// padding, and its distance from the bottom edge is the template's own
-// bottom padding minus 2mm (leaving a small gap above the physical page/paper
-// edge) — the exact relationship "Modern Professional" already used
-// (padding-bottom 11mm → footer 9mm from the bottom), now applied to every
-// template instead of one hardcoded 12mm/9mm pair for all of them. Used for
-// both the on-screen footer and the print footer (see print.css), which both
-// read the same --footer-left/--footer-right custom properties.
+// The footer's left/right inset (on-screen only — see below for print)
+// always matches the template's own left/right padding, and its distance
+// from the bottom edge is the template's own bottom padding minus 2mm
+// (leaving a small gap above the physical page/paper edge) — the exact
+// relationship "Modern Professional" already used (padding-bottom 11mm →
+// footer 9mm from the bottom), now applied to every template instead of one
+// hardcoded 12mm/9mm pair for all of them.
 export function templateFooterInsetMm(tpl) {
   const p = TEMPLATE_PADDING_MM[tpl] || TEMPLATE_PADDING_MM.modern;
   return { left: p.left, right: p.right, bottom: Math.max(0, p.bottom - 2) };
 }
 
-// @page margin is intentionally 0 on every page, top and bottom — a *real*
-// CSS @page margin band is never painted by the document's own background
-// (html/body/.invoice backgrounds simply don't reach into it, in every
-// browser tested), so any margin declared here would show up as a hard-white
-// gap no matter what color the current template is. That's exactly what
-// used to create the blank strip at the top of continuation pages and the
-// blank strip reserved at the bottom of every page. Visual separation
-// between pages instead comes from the physical/PDF page boundary itself
-// (see applyPrintPageHeight in preview.js, which stretches .invoice to an
-// exact multiple of the page height so its background — whatever color the
-// current template uses — fills every page, including the leftover space
-// past the end of the content on the last page).
+// @page margins. Top margin is 0 on the first page (matches the on-screen
+// design, which already accounts for its own internal spacing) and
+// PRINT_CONTINUATION_TOP_MM on every page after that, purely for visual
+// separation between pages — a real @page margin band is never painted by
+// the document's own background (html/body/.invoice backgrounds simply
+// don't reach into it, in any browser), so it always renders as plain white
+// paper. That's expected/normal here (the same way a Word document's page
+// margins are always white regardless of page color) — it's what makes it
+// look like a deliberate page break instead of content just stopping.
+//
+// Bottom margin is PRINT_BOTTOM_MARGIN_MM on every page and is where the
+// repeating footer + live "Page X of Y" counter both live, as @page margin
+// boxes (@bottom-left / @bottom-right below) — NOT as a position:fixed DOM
+// element, despite that being what the on-screen footer itself is. Two
+// things forced that: a real @page margin is the *only* place this content
+// can repeat identically on every page without custom JS re-pagination, and
+// it's also the *only* place guaranteed to never overlap real content — a
+// position:fixed footer was tried here and, despite (after a separate fix)
+// correctly repeating on every page, is clipped entirely by every browser
+// tested the moment any part of it is positioned outside the content box,
+// which means it can only ever render *inside* the content box — the same
+// box real content (table rows etc.) also fills completely on every page,
+// since the browser's automatic pagination has no idea a fixed footer needs
+// room reserved for it there. A margin box sidesteps that completely: it
+// lives outside the content box by definition, so there's no overlap to
+// avoid. The trade-off is Firefox, which has ~no margin-box support — on
+// Firefox the footer and page counter just won't appear, a plain omission
+// rather than a broken/overlapping one, so still an acceptable gap in
+// coverage. The company name / invoice number shown here are read fresh
+// into the generated CSS every time applyPaperSize() runs (see below)
+// rather than bound live, since @page margin-box `content` only accepts
+// static strings/counters, not DOM references.
+export const PRINT_CONTINUATION_TOP_MM = 14;
+export const PRINT_BOTTOM_MARGIN_MM = 10;
+
 function cssStringEscape(s) {
   return String(s ?? "").replace(/\\/g, "\\\\").replace(/"/g, '\\"').replace(/[\r\n]+/g, " ").trim();
 }
@@ -104,11 +126,18 @@ export function applyPaperSize() {
   const p = currentPaper();
   document.documentElement.style.setProperty("--page-w", p.w + "mm");
   document.documentElement.style.setProperty("--page-h", p.h + "mm");
+  const companyName = cssStringEscape($("companyName") ? $("companyName").value.trim() : "") || "Your Company";
+  const invoiceNo = cssStringEscape($("invoiceNumber") ? $("invoiceNumber").value.trim() : "") || "Untitled";
+  const marginBoxFont = `font-family:Inter,"Segoe UI",Arial,sans-serif;font-size:8px;color:#8a94a5`;
   // This is the single source of truth for @page — print.css intentionally
   // has no @page rule of its own, to avoid two separate @page declarations
   // (which Firefox's paged-media engine handles less predictably than
   // Chrome's) ever disagreeing with each other.
-  $("pageSizeCSS").textContent = `@page{size:${p.page};margin:0}`;
+  $("pageSizeCSS").textContent =
+    `@page{size:${p.page};margin:${PRINT_CONTINUATION_TOP_MM}mm 0 ${PRINT_BOTTOM_MARGIN_MM}mm 0;` +
+    `@bottom-left{content:"${companyName}";${marginBoxFont}}` +
+    `@bottom-right{content:"Invoice #${invoiceNo} · Page " counter(page) " of " counter(pages);${marginBoxFont}}}` +
+    `@page:first{margin-top:0}`;
 }
 
 // Snapshot everything needed to fully reconstruct the current invoice

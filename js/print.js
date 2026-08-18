@@ -33,7 +33,7 @@ export function printInvoice(suggestedName) {
   invoice.style.transform = "none";
   invoice.style.marginLeft = "0";
   if (wrap) { wrap.style.height = "auto"; wrap.style.width = "auto"; wrap.style.maxWidth = "none"; }
-  applyPaperSize();   // refreshes the @page footer's page count right before printing
+  applyPaperSize();   // refreshes the @page margin boxes' company/invoice text right before printing
   // Must run after the transform/wrap reset above (needs the invoice at its
   // real, unscaled height to measure correctly) and after applyPaperSize()
   // (needs the current paper's real height) — see applyPrintPageHeight in

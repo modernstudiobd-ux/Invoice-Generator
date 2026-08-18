@@ -1,7 +1,7 @@
 // preview.js — renders the live invoice document (the on-screen A4/Letter canvas).
 
 import { $, esc } from "./dom.js";
-import { state, currentPaper, applyPaperSize, templateFooterInsetMm } from "./state.js";
+import { state, currentPaper, applyPaperSize, templateFooterInsetMm, PRINT_CONTINUATION_TOP_MM, PRINT_BOTTOM_MARGIN_MM } from "./state.js";
 import { money, dateFmt, alignClass, fmtCell, num } from "./format.js";
 import { calc, itemValue } from "./calc.js";
 import { applyAllOptionalColors } from "./accent.js";
@@ -85,23 +85,35 @@ export function renderPreview() {
 let printGuard = false;
 export function setPrintGuard(v) { printGuard = v; }
 
-// Stretches .invoice to an exact multiple of one physical page's height, so
-// its own background (whatever color the current template uses — cream,
-// dark, white, whatever) is what fills every printed page fully, right to
-// the physical edge, instead of leaving a plain-white gap wherever the real
-// content happens to end. @page margins are 0 (see applyPaperSize in
-// state.js), so there's no separate per-page margin math to account for —
-// one page is simply one --page-h tall, uniformly, first page included.
-// Called right before print/PDF export; undone by clearPrintPageHeight()
-// once it's done. Purely a print-time layout concern — the on-screen
-// preview's own page-break guides (renderPageBreaks, below) are unaffected.
+// Stretches .invoice so its own background — cream, dark, white, whatever
+// the current template uses — fills every printed page right up to that
+// page's usable content area (i.e. flush with the top margin and the
+// @page bottom margin, see applyPaperSize in state.js), instead of leaving
+// a plain-white gap wherever the real content happens to end. The two
+// margins aren't symmetric (page 1 has no top margin; every page reserves
+// the same bottom margin for the footer/page-counter margin boxes — see
+// PRINT_CONTINUATION_TOP_MM / PRINT_BOTTOM_MARGIN_MM in state.js), so "one
+// page's worth of height" isn't a single constant the way it was before
+// those margins existed — this walks page-by-page, accumulating each one's
+// usable height, until it covers the real content height, then sets
+// .invoice to that total. Called right before print/PDF export; undone by
+// clearPrintPageHeight() once it's done.
 export function applyPrintPageHeight() {
   const inv = $("invoice");
   if (!inv) return;
   const p = currentPaper();
-  const naturalH = p.h * 96 / 25.4;   // one page's height in CSS px, matching fitInvoiceCanvas
-  const pageCount = Math.max(1, Math.ceil(inv.scrollHeight / naturalH - 0.01));
-  inv.style.minHeight = (pageCount * p.h) + "mm";
+  const pxPerMm = 96 / 25.4;
+  const contentH = inv.scrollHeight;   // real, unscaled content height in px
+  const firstUsableMm = p.h - PRINT_BOTTOM_MARGIN_MM;                            // no top margin on page 1
+  const restUsableMm = p.h - PRINT_CONTINUATION_TOP_MM - PRINT_BOTTOM_MARGIN_MM;   // every page after
+  let totalMm = firstUsableMm, pages = 1;
+  while (totalMm * pxPerMm < contentH - 0.5) {   // small epsilon avoids an
+                                                  // extra false page from
+                                                  // sub-pixel rounding
+    totalMm += restUsableMm;
+    pages++;
+  }
+  inv.style.minHeight = totalMm + "mm";
 }
 
 export function clearPrintPageHeight() {
