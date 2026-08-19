@@ -129,14 +129,23 @@ export function applyPaperSize() {
   const companyName = cssStringEscape($("companyName") ? $("companyName").value.trim() : "") || "Your Company";
   const invoiceNo = cssStringEscape($("invoiceNumber") ? $("invoiceNumber").value.trim() : "") || "Untitled";
   const marginBoxFont = `font-family:Inter,"Segoe UI",Arial,sans-serif;font-size:8px;color:#8a94a5`;
+  // Left/right inset for the margin boxes below — @page's own left/right
+  // margin is 0 (see the @page rule below), so without this the footer text
+  // sits flush against the physical page edge while the invoice table above
+  // it is inset by the current template's own padding (10-20mm depending on
+  // the template), throwing them visibly out of alignment. Reusing
+  // templateFooterInsetMm keeps this in sync with the exact same values the
+  // on-screen footer already uses, for every template, automatically.
+  const tpl = $("template") ? $("template").value : "modern";
+  const footerInset = templateFooterInsetMm(tpl);
   // This is the single source of truth for @page — print.css intentionally
   // has no @page rule of its own, to avoid two separate @page declarations
   // (which Firefox's paged-media engine handles less predictably than
   // Chrome's) ever disagreeing with each other.
   $("pageSizeCSS").textContent =
     `@page{size:${p.page};margin:${PRINT_CONTINUATION_TOP_MM}mm 0 ${PRINT_BOTTOM_MARGIN_MM}mm 0;` +
-    `@bottom-left{content:"${companyName}";${marginBoxFont}}` +
-    `@bottom-right{content:"Invoice #${invoiceNo} · Page " counter(page) " of " counter(pages);${marginBoxFont}}}` +
+    `@bottom-left{content:"${companyName}";margin-left:${footerInset.left}mm;${marginBoxFont}}` +
+    `@bottom-right{content:"Invoice #${invoiceNo} · Page " counter(page) " of " counter(pages);margin-right:${footerInset.right}mm;${marginBoxFont}}}` +
     `@page:first{margin-top:0}`;
 }
 
