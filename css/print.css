@@ -1,43 +1,32 @@
 /* Print & PDF-preview output rules.
    @page itself is intentionally NOT declared here — it's generated
-   dynamically by applyPaperSize() in state.js (paper size + margins +
-   the live "Page X of Y" @bottom-left/@bottom-right margin boxes) and
-   injected into the #pageSizeCSS <style> tag, so there's a single source of
-   truth for it.
+   dynamically by applyPaperSize() in state.js (paper size only; margin is
+   always 0) and injected into the #pageSizeCSS <style> tag, so there's a
+   single source of truth for it.
 
-   Margins: 0 on top of page 1, PRINT_CONTINUATION_TOP_MM on top of every
-   page after that (just for visual separation between pages — real @page
-   margin is always plain white paper, no element's background reaches into
-   it, in any browser), and PRINT_BOTTOM_MARGIN_MM on the bottom of every
-   page, which is NOT wasted space — it's where the repeating footer +
-   live page-counter margin boxes live (see state.js).
-
-   Page-to-page background: .invoice is stretched at print time
-   (applyPrintPageHeight in preview.js) to exactly cover every page's real
-   usable area (flush with the margins above), so its own background fills
-   every page, including whatever's left over past the end of the real
-   content on the last page, instead of leaving a plain-white gap.
-
-   The on-screen footer (.footer, position:absolute — see invoice.css) is
-   hidden for print rather than reused. Two other approaches were tried and
-   both had a real correctness problem, not just a cosmetic one:
-     - position:fixed does repeat on every page once the on-screen zoom
-       transform is cleared (a transform'd ancestor otherwise turns "fixed"
-       into something anchored to that ancestor instead of the page) — but
-       normal document flow has no idea a fixed element needs room reserved
-       for it, so real content (e.g. table rows) can flow right underneath
-       it and get visually covered on every page except the last, where
-       the template's own bottom padding happens to save it.
-     - position:absolute anchored to .invoice only resolves correctly
-       against the *whole* (now multi-page-tall) box, so it only ever lands
-       on the physical page that offset happens to fall on — never at the
-       bottom of every individual page.
-   A @page margin box is the only mechanism here that's genuinely reserved
-   space the browser accounts for automatically on every page, so there's
-   no overlap risk — the trade-off is Firefox, which has ~no support for
-   margin-box content, so on Firefox specifically the footer and page
-   count just don't appear when printing: a plain omission, not a broken
-   or overlapping one. */
+   @page margin is 0 everywhere on purpose: a real @page margin band can
+   never be painted by any element's background, in any browser — it's
+   physically outside the content box. That ruled out using it for both
+   page-to-page spacing and the repeating footer, since either would show up
+   as a plain white gap on any template that isn't already white. Both are
+   instead built as real, painted, in-flow content within .invoice —
+   see applyPrintPagination in preview.js, which:
+     - simulates the browser's own break-inside:avoid pagination *before*
+       printing (using real measured heights of the already-rendered
+       content) so it knows in advance exactly which row/section starts each
+       page, then forces the real breaks to land exactly there and adds a
+       colored top-padding spacer at each one — real content, so it's
+       painted in whatever background color the current template uses,
+     - stretches .invoice to an exact multiple of the page height so that
+       background fills every page fully, including whatever's left over
+       past the end of the real content on the last page, and
+     - replaces the single on-screen footer with one absolutely-positioned
+       clone per page (each at a precisely computed offset, not just
+       "bottom:Xmm" — that only ever resolves against the bottom of the
+       *whole* stretched box, i.e. only the last page, once .invoice spans
+       more than one physical page), each showing a live "Page N of TOTAL".
+   None of this depends on @page margin boxes, so — unlike the version of
+   this before — it works the same way in Firefox as everywhere else. */
 @media print{
   html,body{background:#fff}
   .sidebar,.sidebar-resizer,.canvasbar{display:none!important}
@@ -57,10 +46,13 @@
   .invtable tfoot{display:table-footer-group}
   .invtable tr,.invtable td,.invtable th{break-inside:avoid;page-break-inside:avoid}
   .inv-header,.billrow,.statusbalance,.balance,.bottomgrid,.notebox,.summary,.paymentgrid{break-inside:avoid;page-break-inside:avoid}
-  /* Replaced by the @bottom-left/@bottom-right margin boxes in state.js —
-     see the comment above for why those, and not this element, carry the
-     footer for print. */
-  .invoice .footer{display:none!important}
+  /* The real footer is hidden for print — applyPrintPagination (see above)
+     replaces it with per-page .footer-print-clone elements instead, which
+     this deliberately does NOT match (they still carry the plain .footer
+     class too, for styling, so they'd otherwise be caught by this same
+     rule). JS already sets the real footer's visibility:hidden inline for
+     this too; the rule here is just a print-only safety net on top of that. */
+  .invoice .footer:not(.footer-print-clone){display:none!important}
   /* Force background colors/fills to print consistently across Chrome, Edge,
      Firefox and Safari without relying on the browser's own "Background
      graphics" checkbox. */
