@@ -71,27 +71,53 @@ const TEMPLATE_PADDING_MM = {
   dark: { top: 14, right: 14, bottom: 14, left: 14 }
 };
 
-// The footer's left/right inset (on-screen only — see below for print)
-// always matches the template's own left/right padding, and its distance
-// from the bottom edge is the template's own bottom padding minus 2mm
-// (leaving a small gap above the physical page/paper edge) — the exact
-// relationship "Modern Professional" already used (padding-bottom 11mm →
-// footer 9mm from the bottom), now applied to every template instead of one
-// hardcoded 12mm/9mm pair for all of them.
+// The footer's left/right inset (on-screen, and reused for the print
+// margin-box insets below) always matches the template's own left/right
+// padding, and its distance from the bottom edge is the template's own
+// bottom padding minus 2mm (leaving a small gap above the physical
+// page/paper edge) — the exact relationship "Modern Professional" already
+// used (padding-bottom 11mm → footer 9mm from the bottom), now applied to
+// every template instead of one hardcoded 12mm/9mm pair for all of them.
 export function templateFooterInsetMm(tpl) {
   const p = TEMPLATE_PADDING_MM[tpl] || TEMPLATE_PADDING_MM.modern;
   return { left: p.left, right: p.right, bottom: Math.max(0, p.bottom - 2) };
 }
 
-// @page margin is always 0, on every page — a real @page margin band can
-// never be painted by the document's own background in any browser (it's
-// physically outside the content box), which is what made every previous
-// approach here (a plain white gap for spacing, or @page margin boxes for
-// the footer) fall over the moment a template used a non-white background.
-// Both page-to-page spacing and the repeating footer are instead built as
-// real, painted, in-flow content within .invoice itself — see
-// applyPrintPagination in preview.js — so there is nothing left that's
-// structurally unpaintable.
+// Continuation pages (2nd onward) get a top margin so a multi-page invoice
+// doesn't look like it just abruptly continues flush against the page edge.
+// Bottom margin is on every page and is where the repeating footer + live
+// "Page X of Y" counter live, as real @page margin boxes (@bottom-left /
+// @bottom-right below).
+//
+// This went through two other designs first, both of which turned out to
+// have a real correctness problem, not just a cosmetic one:
+//   - A predicted, JS-simulated pagination (measuring row heights *before*
+//     printing, then forcing explicit page breaks + real in-flow padding at
+//     the predicted spots) let the reserved space be colored instead of
+//     plain white margin. But it's exactly that: a *prediction*, made under
+//     normal screen layout before print media is actually active — and it
+//     doesn't always match the real print layout. Two different concrete
+//     failures showed up from that gap: one template undercounted pages
+//     outright (an orphan near-empty page with a wrong "Page X of Y"), and
+//     another had real content run slightly past its predicted spot straight
+//     into the reserved footer band, overlapping it — because that space
+//     was only ever "empty" by assumption, nothing actually reserved it.
+//   - position:fixed for the footer avoids the prediction problem but has
+//     no way to reserve its own space in normal flow, so real content can
+//     still flow right underneath it.
+// A @page margin box sidesteps both: the browser reserves that space for
+// every page itself, guaranteed, with zero prediction involved, which is
+// worth plain white margin instead of colored. The trade-off is Firefox,
+// which has ~no margin-box support — on Firefox the footer and page counter
+// just won't appear when printing, a plain omission rather than a broken or
+// overlapping one.
+export const PRINT_CONTINUATION_TOP_MM = 14;
+// Bottom margin needs to comfortably clear the current template's own
+// footer text — see applyPaperSize below, which derives it per template
+// from templateFooterInsetMm rather than using one fixed value for all of
+// them.
+const PRINT_BOTTOM_CLEARANCE_MM = 8;
+
 function cssStringEscape(s) {
   return String(s ?? "").replace(/\\/g, "\\\\").replace(/"/g, '\\"').replace(/[\r\n]+/g, " ").trim();
 }
@@ -100,11 +126,25 @@ export function applyPaperSize() {
   const p = currentPaper();
   document.documentElement.style.setProperty("--page-w", p.w + "mm");
   document.documentElement.style.setProperty("--page-h", p.h + "mm");
+  const companyName = cssStringEscape($("companyName") ? $("companyName").value.trim() : "") || "Your Company";
+  const invoiceNo = cssStringEscape($("invoiceNumber") ? $("invoiceNumber").value.trim() : "") || "Untitled";
+  const marginBoxFont = `font-family:Inter,"Segoe UI",Arial,sans-serif;font-size:8px;color:#8a94a5`;
+  const tpl = $("template") ? $("template").value : "modern";
+  const footerInset = templateFooterInsetMm(tpl);
+  const bottomMarginMm = footerInset.bottom + PRINT_BOTTOM_CLEARANCE_MM;
+  // Left/right inset for the margin boxes below — @page's own left/right
+  // margin is 0, so without this the footer text sits flush against the
+  // physical page edge while the invoice table above it is inset by the
+  // current template's own padding, throwing them visibly out of alignment.
   // This is the single source of truth for @page — print.css intentionally
   // has no @page rule of its own, to avoid two separate @page declarations
   // (which Firefox's paged-media engine handles less predictably than
   // Chrome's) ever disagreeing with each other.
-  $("pageSizeCSS").textContent = `@page{size:${p.page};margin:0}`;
+  $("pageSizeCSS").textContent =
+    `@page{size:${p.page};margin:${PRINT_CONTINUATION_TOP_MM}mm 0 ${bottomMarginMm}mm 0;` +
+    `@bottom-left{content:"${companyName}";margin-left:${footerInset.left}mm;${marginBoxFont}}` +
+    `@bottom-right{content:"Invoice #${invoiceNo} · Page " counter(page) " of " counter(pages);margin-right:${footerInset.right}mm;${marginBoxFont}}}` +
+    `@page:first{margin-top:0}`;
 }
 
 // Snapshot everything needed to fully reconstruct the current invoice

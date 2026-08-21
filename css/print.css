@@ -1,32 +1,35 @@
 /* Print & PDF-preview output rules.
    @page itself is intentionally NOT declared here — it's generated
-   dynamically by applyPaperSize() in state.js (paper size only; margin is
-   always 0) and injected into the #pageSizeCSS <style> tag, so there's a
-   single source of truth for it.
+   dynamically by applyPaperSize() in state.js (paper size + margins + the
+   live "Page X of Y" @bottom-left/@bottom-right margin boxes) and injected
+   into the #pageSizeCSS <style> tag, so there's a single source of truth.
 
-   @page margin is 0 everywhere on purpose: a real @page margin band can
-   never be painted by any element's background, in any browser — it's
-   physically outside the content box. That ruled out using it for both
-   page-to-page spacing and the repeating footer, since either would show up
-   as a plain white gap on any template that isn't already white. Both are
-   instead built as real, painted, in-flow content within .invoice —
-   see applyPrintPagination in preview.js, which:
-     - simulates the browser's own break-inside:avoid pagination *before*
-       printing (using real measured heights of the already-rendered
-       content) so it knows in advance exactly which row/section starts each
-       page, then forces the real breaks to land exactly there and adds a
-       colored top-padding spacer at each one — real content, so it's
-       painted in whatever background color the current template uses,
-     - stretches .invoice to an exact multiple of the page height so that
-       background fills every page fully, including whatever's left over
-       past the end of the real content on the last page, and
-     - replaces the single on-screen footer with one absolutely-positioned
-       clone per page (each at a precisely computed offset, not just
-       "bottom:Xmm" — that only ever resolves against the bottom of the
-       *whole* stretched box, i.e. only the last page, once .invoice spans
-       more than one physical page), each showing a live "Page N of TOTAL".
-   None of this depends on @page margin boxes, so — unlike the version of
-   this before — it works the same way in Firefox as everywhere else. */
+   Real pagination — which row/section ends up on which physical page — is
+   entirely native: the browser's own break-inside:avoid (below) plus real
+   @page margins. Nothing here tries to predict it in JS ahead of time.
+   An earlier version of this did (to get a colored top margin and a
+   footer that could repeat without @page margin-box support), by measuring
+   row heights *before* printing and forcing explicit breaks + real in-flow
+   padding at the predicted spots. It didn't hold up: that measurement runs
+   under normal screen layout, before print media is actually active, and
+   on two separate templates it didn't match the real print layout closely
+   enough — once undercounting pages outright (an orphan near-empty page),
+   once letting real content run past its predicted spot straight into the
+   footer's reserved space and overlap it. A @page margin box has neither
+   problem, since the browser reserves that space itself on every page,
+   guaranteed, with no prediction involved — the trade-off is Firefox,
+   which has ~no margin-box support, so on Firefox specifically the footer
+   and page count just don't appear when printing: a plain, visible-only-in-
+   its-absence gap, not a broken or overlapping one.
+
+   .invoice is still stretched at print time (applyPrintPageHeight in
+   preview.js) to a best-effort multiple of the page height, so its own
+   background — whatever color the current template uses — fills every
+   page fully, including whatever's left over past the end of the real
+   content on the last page. Getting that estimate slightly wrong is low-
+   stakes now (unlike the old predicted-breaks version): the worst case is
+   the background stretch falling a little short on some edge case, not a
+   broken layout, since real pagination doesn't depend on it anymore. */
 @media print{
   html,body{background:#fff}
   .sidebar,.sidebar-resizer,.canvasbar{display:none!important}
@@ -46,13 +49,10 @@
   .invtable tfoot{display:table-footer-group}
   .invtable tr,.invtable td,.invtable th{break-inside:avoid;page-break-inside:avoid}
   .inv-header,.billrow,.statusbalance,.balance,.bottomgrid,.notebox,.summary,.paymentgrid{break-inside:avoid;page-break-inside:avoid}
-  /* The real footer is hidden for print — applyPrintPagination (see above)
-     replaces it with per-page .footer-print-clone elements instead, which
-     this deliberately does NOT match (they still carry the plain .footer
-     class too, for styling, so they'd otherwise be caught by this same
-     rule). JS already sets the real footer's visibility:hidden inline for
-     this too; the rule here is just a print-only safety net on top of that. */
-  .invoice .footer:not(.footer-print-clone){display:none!important}
+  /* Replaced by the @bottom-left/@bottom-right margin boxes in state.js —
+     see the comment above for why those, and not this element, carry the
+     footer for print. */
+  .invoice .footer{display:none!important}
   /* Force background colors/fills to print consistently across Chrome, Edge,
      Firefox and Safari without relying on the browser's own "Background
      graphics" checkbox. */

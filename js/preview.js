@@ -1,7 +1,7 @@
 // preview.js — renders the live invoice document (the on-screen A4/Letter canvas).
 
 import { $, esc } from "./dom.js";
-import { state, currentPaper, applyPaperSize, templateFooterInsetMm } from "./state.js";
+import { state, currentPaper, applyPaperSize, templateFooterInsetMm, PRINT_CONTINUATION_TOP_MM } from "./state.js";
 import { money, dateFmt, alignClass, fmtCell, num } from "./format.js";
 import { calc, itemValue } from "./calc.js";
 import { applyAllOptionalColors } from "./accent.js";
@@ -86,217 +86,50 @@ let printGuard = false;
 export function setPrintGuard(v) { printGuard = v; }
 
 const MM_TO_PX = 96 / 25.4;
-// Colored breathing room at the top of continuation pages (page 2+) — real,
-// in-flow content (a padding-top added to whichever row/section actually
-// starts that page — see applyPrintPagination below), not a @page margin,
-// so it's painted in the template's real background color instead of
-// showing up as a plain white gap.
-const PRINT_TOP_SPACER_MM = 10;
-// Extra clearance reserved above the footer on every page, on top of the
-// template's own footer inset, so real content can never flow underneath
-// the footer that gets placed there afterward.
-const PRINT_FOOTER_CLEARANCE_MM = 7;
 
-let printPagination = null;
-
-// Multi-page print/PDF output needs three things no single native CSS
-// feature provides all of together: (1) every page's background fully
-// painted — including a colored top margin on continuation pages, not a
-// blank one, (2) a footer that repeats on every page, and (3) a live
-// "Page X of Y" counter. @page margin boxes give (2) and (3) but only in
-// Chrome/Edge/Safari (Firefox has ~no support) and can only ever be plain
-// white space, never colored (a real @page margin is outside the content
-// box by definition — no element's background can reach into it, in any
-// browser). This instead replicates the browser's own break-inside:avoid
-// pagination *before* printing, using real measured heights of the
-// already-rendered content, so it knows in advance exactly which row/section
-// will start each page — then:
-//   - forces those breaks explicitly (so the real browser pagination that
-//     happens during printing matches this calculation exactly, instead of
-//     the two disagreeing), and adds real in-flow top padding there instead
-//     of a blank margin,
-//   - stretches .invoice to an exact multiple of the page height so its own
-//     background — whatever color the current template uses — fills every
-//     page fully, and
-//   - inserts one absolutely-positioned footer clone per page (cloned from
-//     the real .footer element, so it stays in sync with every template's
-//     styling), each showing a live "Page N of TOTAL", positioned at a
-//     precise computed offset rather than "the bottom of .invoice" (which
-//     only ever resolves to the bottom of the *last* page once .invoice
-//     spans more than one physical page).
-// Works identically in every browser, including Firefox, since none of it
-// depends on @page margin boxes. Call right before print/PDF export; undone
-// by clearPrintPagination() once it's done.
-export function applyPrintPagination() {
+// Stretches .invoice so its own background — whatever color the current
+// template uses — fills every printed page fully, including whatever's
+// left over past the end of the real content on the last page, instead of
+// leaving a plain-white gap there. Real pagination (which page each row
+// actually lands on) is handled entirely by the browser itself now — real
+// @page margins (state.js) plus each row's own break-inside:avoid — so
+// this only has one job, and an easy one: how many pages does the content
+// need. Getting that slightly wrong here just means the background stretch
+// falls a little short on an edge case; it can no longer produce a broken
+// or overlapping page the way an earlier version of this that also tried
+// to *predict and force* real page breaks did (see the git history/PR
+// description if you're curious what that looked like and why it didn't
+// hold up — two different templates broke it in two different ways).
+// Call right before print/PDF export; undone by clearPrintPageHeight().
+export function applyPrintPageHeight() {
   const inv = $("invoice");
-  const table = inv ? inv.querySelector(".invtable") : null;
-  const thead = table ? table.querySelector("thead") : null;
-  const tbody = $("pItems");
-  const footer = inv ? inv.querySelector(".footer") : null;
-  if (!inv || !table || !tbody) return;
-
+  if (!inv) return;
   const tpl = $("template") ? $("template").value : "modern";
   const footerInset = templateFooterInsetMm(tpl);
   const p = currentPaper();
   const pageHpx = p.h * MM_TO_PX;
-  const topSpacerPx = PRINT_TOP_SPACER_MM * MM_TO_PX;
-  const footerReservePx = (footerInset.bottom + PRINT_FOOTER_CLEARANCE_MM) * MM_TO_PX;
-  const theadHpx = thead ? thead.offsetHeight : 0;
-  // Small safety margin on top of the real reserved space above: this
-  // function measures heights under normal screen layout, before print
-  // media (and whatever it changes) is actually active, so it's a close
-  // prediction of the real print layout rather than a guarantee of it —
-  // this trims a little more off the budget than strictly measured, to
-  // absorb any small discrepancy that shows up once printing actually
-  // happens instead of letting it silently overflow onto an unplanned page.
-  // (measuredPageCount below is the actual guarantee — this just makes it
-  // less likely to be needed.)
-  const budgetSafetyPx = 0.03 * pageHpx;
+  const topMarginPx = PRINT_CONTINUATION_TOP_MM * MM_TO_PX;
+  const bottomMarginPx = (footerInset.bottom + 8) * MM_TO_PX;   // keep in sync with PRINT_BOTTOM_CLEARANCE_MM in state.js
+  const firstBudget = pageHpx - bottomMarginPx;
+  const laterBudget = pageHpx - topMarginPx - bottomMarginPx;
 
-  // Every top-level flow unit in document order: each direct child of
-  // .invoice is one unit, except .invtable, whose body rows are each their
-  // own unit (so the table can split across pages row-by-row like it always
-  // has) and .footer, which isn't part of this pagination — it's rebuilt
-  // from scratch below.
-  const units = [];
-  Array.from(inv.children).forEach(child => {
-    if (child === table) {
-      Array.from(tbody.children).forEach(row => units.push({ el: row, h: row.offsetHeight, isRow: true }));
-    } else if (child === footer || child.classList.contains("page-break-line") || child.classList.contains("page-break-chip")) {
-      // handled separately / screen-only guides, not real content
-    } else if (!child.classList.contains("section-hidden")) {
-      units.push({ el: child, h: child.offsetHeight, isRow: false });
-    }
-  });
-
-  // Greedy bucket into pages — mirrors the browser's own break-inside:avoid
-  // algorithm (an atomic unit that doesn't fit in what's left of the current
-  // page moves to the next one whole), using real rendered heights instead
-  // of guessing, so this matches what the browser would do on its own; the
-  // difference is this runs *first*, so the actual breaks (forced below via
-  // break-before:page) are known in advance instead of left to chance.
-  const firstBudget = pageHpx - footerReservePx - budgetSafetyPx;
-  const laterBudget = pageHpx - topSpacerPx - footerReservePx - budgetSafetyPx;
-  const pages = [];
-  let current = { units: [], usedPx: 0, hasRow: false };
-  let budget = firstBudget;
-  units.forEach(u => {
-    let extra = u.isRow && !current.hasRow ? theadHpx : 0;
-    if (current.units.length > 0 && current.usedPx + u.h + extra > budget) {
-      pages.push(current);
-      current = { units: [], usedPx: 0, hasRow: false };
-      budget = laterBudget;
-      extra = u.isRow ? theadHpx : 0;
-    }
-    current.units.push(u);
-    current.usedPx += u.h + extra;
-    if (u.isRow) current.hasRow = true;
-  });
-  pages.push(current);
-  const pageCount = pages.length;
-
-  // Force the real breaks to land exactly where the simulation above put
-  // them, and add the colored top spacer there (as real padding on the
-  // element itself — table rows use border-collapse:collapse, which only
-  // honors padding on <td>, not <tr>, hence the isRow branch).
-  const touched = [];
-  pages.forEach((pg, i) => {
-    if (i === 0 || !pg.units.length) return;
-    const first = pg.units[0];
-    if (first.isRow) {
-      Array.from(first.el.children).forEach(cell => {
-        touched.push({ el: cell, prop: "paddingTop", prev: cell.style.paddingTop });
-        cell.style.paddingTop = `calc(${getComputedStyle(cell).paddingTop} + ${PRINT_TOP_SPACER_MM}mm)`;
-      });
-      touched.push({ el: first.el, prop: "breakBefore", prev: first.el.style.breakBefore });
-      first.el.style.breakBefore = "page";
-    } else {
-      touched.push({ el: first.el, prop: "marginTop", prev: first.el.style.marginTop });
-      touched.push({ el: first.el, prop: "breakBefore", prev: first.el.style.breakBefore });
-      first.el.style.marginTop = `calc(${getComputedStyle(first.el).marginTop} + ${PRINT_TOP_SPACER_MM}mm)`;
-      first.el.style.breakBefore = "page";
-    }
-  });
-  if (window.__PAGINATION_DEBUG__) {
-    console.log("PAGINATION_DEBUG", JSON.stringify({
-      pageHpx, firstBudget, laterBudget, theadHpx, footerReservePx,
-      pages: pages.map(pg => ({ n: pg.units.length, used: pg.usedPx })),
-      breakBeforeRows: Array.from(document.querySelectorAll('#pItems tr')).filter(r => r.style.breakBefore === "page").map(r => r.textContent)
-    }));
+  const contentH = inv.scrollHeight;
+  const cumulative = [];
+  let acc = 0, n = 0;
+  while (acc < contentH - 0.5 || n === 0) {
+    acc += n === 0 ? firstBudget : laterBudget;
+    cumulative.push(acc);
+    n++;
+    if (n > 500) break;   // sane ceiling — guards against an infinite loop if something's off
   }
-
-  // Safety net: the bucketing above predicts each page's content from
-  // heights measured *before* printing (this function runs under normal
-  // screen layout — print media, and whatever it changes, isn't active
-  // until window.print() actually runs afterward). For most templates that
-  // prediction matches the real print layout exactly, but it's not
-  // guaranteed to for every one, and an underestimate anywhere is
-  // expensive: the browser's own break-inside:avoid still protects
-  // individual rows from being split, but a whole extra page can silently
-  // appear beyond what pageCount predicted — one this function wouldn't
-  // stretch the background into or generate a footer clone for, which is
-  // what actually produced the reported bug (a near-empty orphan page with
-  // no footer and the wrong "Page X of Y" on the page after it).
-  // inv.scrollHeight is a plain continuous-flow measurement — it isn't
-  // affected by break-before (a paged-media concept, inert outside actual
-  // pagination) — so re-reading it here, after the real spacer padding
-  // above has been added, gives the true total content height regardless
-  // of whether the bucketing above sliced it into the right pages. Using
-  // the larger of the two page counts below means the stretch and the
-  // footers always cover the true content even when they don't, keeping
-  // this a "some page has fewer rows than ideal" problem instead of a
-  // "blank orphan page with no footer" one.
-  const measuredPageCount = Math.max(1, Math.ceil(inv.scrollHeight / pageHpx - 0.01));
-  const safePageCount = Math.max(pageCount, measuredPageCount);
-  if (window.__PAGINATION_DEBUG__ && safePageCount !== pageCount) {
-    console.log("PAGINATION_DEBUG_MISMATCH", JSON.stringify({ predicted: pageCount, measured: measuredPageCount, scrollHeight: inv.scrollHeight }));
-  }
-
-  // Stretch .invoice so its own background fills every page fully —
-  // uniform now that every page is exactly one physical page tall (@page
-  // margin is always 0 — see applyPaperSize in state.js).
-  inv.style.minHeight = (safePageCount * p.h) + "mm";
-
-  // Replace the single real footer with one absolutely-positioned clone per
-  // page. Position is computed directly (distance from the *bottom of the
-  // whole stretched box*, in exactly (pageCount - pageNum) full pages) —
-  // not "bottom:Xmm" the way the on-screen footer works, since that only
-  // ever resolves against .invoice's total height, i.e. only the last page,
-  // once .invoice is taller than one physical page.
-  const clones = [];
-  let footerPrevVisibility = "";
-  if (footer && !footer.classList.contains("section-hidden")) {
-    footerPrevVisibility = footer.style.visibility;
-    footer.style.visibility = "hidden";
-    const invNo = ($("invoiceNumber") && $("invoiceNumber").value.trim()) || "Untitled";
-    const companyText = footer.querySelector("#pFooterCompany") ? footer.querySelector("#pFooterCompany").textContent : "";
-    for (let i = 1; i <= safePageCount; i++) {
-      const clone = footer.cloneNode(true);
-      clone.removeAttribute("id");
-      clone.classList.remove("section-hidden");
-      clone.classList.add("footer-print-clone");
-      clone.style.visibility = "visible";
-      clone.style.bottom = ((safePageCount - i) * p.h + footerInset.bottom) + "mm";
-      const invoiceSpan = clone.querySelector("#pFooterInvoice");
-      if (invoiceSpan) invoiceSpan.textContent = safePageCount > 1 ? `Invoice #${invNo}  ·  Page ${i} of ${safePageCount}` : `Invoice #${invNo}`;
-      const companySpan = clone.querySelector("#pFooterCompany");
-      if (companySpan) companySpan.textContent = companyText;
-      inv.appendChild(clone);
-      clones.push(clone);
-    }
-  }
-
-  printPagination = { touched, clones, footer, footerPrevVisibility };
+  const pageCount = cumulative.length;
+  const totalPx = cumulative[pageCount - 1];
+  inv.style.minHeight = (totalPx / MM_TO_PX) + "mm";
 }
 
-export function clearPrintPagination() {
+export function clearPrintPageHeight() {
   const inv = $("invoice");
   if (inv) inv.style.minHeight = "";
-  if (!printPagination) return;
-  printPagination.touched.forEach(t => { t.el.style[t.prop] = t.prev; });
-  printPagination.clones.forEach(c => c.remove());
-  if (printPagination.footer) printPagination.footer.style.visibility = printPagination.footerPrevVisibility;
-  printPagination = null;
 }
 
 export function fitInvoiceCanvas() {
